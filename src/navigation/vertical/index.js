@@ -12,11 +12,11 @@ const navigation = () => {
       children: [
         {
           title: 'Product List',
-          path: '/dashboard1'
+          path: '/products'
         },
         {
           title: 'Add Product',
-          path: '/dashboard2'
+          path: '/products/add-product'
         }
       ]
     },
@@ -26,11 +26,11 @@ const navigation = () => {
       children: [
         {
           title: 'Order List',
-          path: '/apps/roles'
+          path: '/orders'
         },
         {
           title: 'Order Details',
-          path: '/apps/permissions'
+          path: '/orders/order-detail'
         }
       ]
     },
@@ -40,11 +40,11 @@ const navigation = () => {
       children: [
         {
           title: 'Category List',
-          path: '/apps/roles'
+          path: '/categories'
         },
         {
           title: 'Subcategory List',
-          path: '/apps/permissions'
+          path: '/subcategory'
         }
       ]
     },
@@ -54,11 +54,11 @@ const navigation = () => {
       children: [
         {
           title: 'Customer List',
-          path: '/apps/roles'
+          path: '/customers'
         },
         {
           title: 'Customer Details',
-          path: '/apps/permissions'
+          path: '/customers/customer-detail'
         }
       ]
     }
