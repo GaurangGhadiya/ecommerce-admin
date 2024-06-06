@@ -36,6 +36,16 @@ const CustomRadioIcons = props => {
           }}
         >
           {icon ? <Icon icon={icon} {...iconProps} /> : null}
+
+          {title ? (
+            typeof title === 'string' ? (
+              <Typography variant='h6' sx={{ ...(content ? { mb: 2 } : { my: 'auto' }) }}>
+                {title}
+              </Typography>
+            ) : (
+              title
+            )
+          ) : null}
           <Radio
             name={name}
             size='small'
@@ -46,15 +56,6 @@ const CustomRadioIcons = props => {
 
             // sx={{ mb: -2, ...(!icon && !title && !content && { mt: -2 }) }}
           />
-          {title ? (
-            typeof title === 'string' ? (
-              <Typography variant='h6' sx={{ ...(content ? { mb: 2 } : { my: 'auto' }) }}>
-                {title}
-              </Typography>
-            ) : (
-              title
-            )
-          ) : null}
           {content ? (
             typeof content === 'string' ? (
               <Typography variant='body2' sx={{ my: 'auto', textAlign: 'center' }}>

@@ -1,4 +1,17 @@
-import { Button, Card, CardContent, CardHeader, Grid, InputLabel, MenuItem, Typography } from '@mui/material'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Switch,
+  Typography
+} from '@mui/material'
 import React, { useState } from 'react'
 import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
 import CustomRadioIcons from 'src/@core/components/custom-radio/icons'
@@ -7,7 +20,12 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import PageHeader from 'src/@core/components/page-header'
 
 const AddProduct = () => {
-  const [selectedRadio, setSelectedRadio] = useState('noDiscount')
+  const [selectedRadio, setSelectedRadio] = useState('percentage')
+  const [checked, setChecked] = useState(true)
+
+  const handleChange = event => {
+    setChecked(event.target.checked)
+  }
 
   const data = [
     // {
@@ -77,8 +95,11 @@ const AddProduct = () => {
                 <Grid item xs={12}>
                   <CustomTextField fullWidth label='Name' placeholder='Product title' />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                   <CustomTextField fullWidth type='number' label='SKU' placeholder='SKU' />
+                </Grid>
+                <Grid item xs={6}>
+                  <CustomTextField fullWidth type='number' label='Quantity' placeholder='Quantity' />
                 </Grid>
                 <Grid item xs={12}>
                   <InputLabel>Description (Optional)</InputLabel>
@@ -128,6 +149,57 @@ const AddProduct = () => {
                 <Grid item xs={12}>
                   <FileUploaderRestrictions />
                 </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+          <Card style={{ marginTop: '30px' }}>
+            <CardHeader title='Pricing' />
+            <CardContent>
+              <Grid container spacing={6}>
+                <Grid item xs={12}>
+                  <CustomTextField fullWidth type='number' label='Base Price' placeholder='Product Price' />
+                </Grid>
+                <Grid item xs={12} pt={0}>
+                  <FormControlLabel
+                    label='Discount available on this product'
+                    control={<Checkbox checked={checked} onChange={handleChange} name='discount' />}
+                  />
+                </Grid>
+                {checked && (
+                  <>
+                    <Grid item xs={12}>
+                      <Grid container spacing={4}>
+                        {data.map((item, index) => (
+                          <CustomRadioIcons
+                            key={index}
+                            data={data[index]}
+                            selected={selectedRadio}
+                            name='custom-radios-deal'
+                            gridProps={{ sm: 6, xs: 12 }}
+                            handleChange={handleRadioChange}
+                          />
+                        ))}
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={12}>
+                      {selectedRadio == 'fixed' ? (
+                        <CustomTextField
+                          fullWidth
+                          type='number'
+                          label='Discounted Price'
+                          placeholder='Discounted Price'
+                        />
+                      ) : selectedRadio == 'percentage' ? (
+                        <CustomTextField
+                          fullWidth
+                          type='number'
+                          label='Discounted Percentage'
+                          placeholder='Discounted Percentage'
+                        />
+                      ) : null}
+                    </Grid>
+                  </>
+                )}
               </Grid>
             </CardContent>
           </Card>
