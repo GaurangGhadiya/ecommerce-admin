@@ -1,10 +1,49 @@
-import { Button, Card, CardContent, CardHeader, Grid, InputLabel, Typography } from '@mui/material'
-import React from 'react'
+import { Button, Card, CardContent, CardHeader, Grid, InputLabel, MenuItem, Typography } from '@mui/material'
+import React, { useState } from 'react'
+import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
+import CustomRadioIcons from 'src/@core/components/custom-radio/icons'
 import EditorControlled from 'src/@core/components/editor'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import PageHeader from 'src/@core/components/page-header'
 
 const AddProduct = () => {
+  const [selectedRadio, setSelectedRadio] = useState('noDiscount')
+
+  const data = [
+    // {
+    //   value: 'noDiscount',
+    //   title: (
+    //     <Typography variant='h6' sx={{ mb: 1 }}>
+    //       No Discount
+    //     </Typography>
+    //   )
+    // },
+    {
+      value: 'percentage',
+      title: (
+        <Typography variant='h6' sx={{ mb: 1 }}>
+          Percentage %
+        </Typography>
+      )
+    },
+    {
+      value: 'fixed',
+      title: (
+        <Typography variant='h6' sx={{ mb: 1 }}>
+          Fixed Price
+        </Typography>
+      )
+    }
+  ]
+
+  const handleRadioChange = prop => {
+    if (typeof prop === 'string') {
+      setSelectedRadio(prop)
+    } else {
+      setSelectedRadio(prop.target.value)
+    }
+  }
+
   return (
     <>
       <Grid container spacing={6}>
@@ -44,6 +83,50 @@ const AddProduct = () => {
                 <Grid item xs={12}>
                   <InputLabel>Description (Optional)</InputLabel>
                   <EditorControlled />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+
+          <Card style={{ marginTop: '30px' }}>
+            <CardHeader title='Media' />
+            <CardContent>
+              <Grid container spacing={6}>
+                <Grid item xs={12}>
+                  <FileUploaderRestrictions />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+          <Card style={{ marginTop: '30px' }}>
+            <CardHeader title='Variants' />
+            <CardContent>
+              <Grid container spacing={6}>
+                <Grid item xs={6}>
+                  <CustomTextField select defaultValue='' label='Options' id='custom-select' fullWidth>
+                    <MenuItem value={10}>Ten</MenuItem>
+                    <MenuItem value={20}>Twenty</MenuItem>
+                    <MenuItem value={30}>Thirty</MenuItem>
+                  </CustomTextField>
+                  <Button variant='contained' style={{ marginTop: '15px' }}>
+                    Add another option
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <CustomTextField fullWidth label='Value' placeholder='Enter value' />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardHeader title='Thumbnail' />
+            <CardContent>
+              <Grid container spacing={6}>
+                <Grid item xs={12}>
+                  <FileUploaderRestrictions />
                 </Grid>
               </Grid>
             </CardContent>

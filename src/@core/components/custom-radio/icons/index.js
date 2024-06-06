@@ -36,6 +36,16 @@ const CustomRadioIcons = props => {
           }}
         >
           {icon ? <Icon icon={icon} {...iconProps} /> : null}
+          <Radio
+            name={name}
+            size='small'
+            color={color}
+            value={value}
+            onChange={handleChange}
+            checked={selected === value}
+
+            // sx={{ mb: -2, ...(!icon && !title && !content && { mt: -2 }) }}
+          />
           {title ? (
             typeof title === 'string' ? (
               <Typography variant='h6' sx={{ ...(content ? { mb: 2 } : { my: 'auto' }) }}>
@@ -54,15 +64,6 @@ const CustomRadioIcons = props => {
               content
             )
           ) : null}
-          <Radio
-            name={name}
-            size='small'
-            color={color}
-            value={value}
-            onChange={handleChange}
-            checked={selected === value}
-            sx={{ mb: -2, ...(!icon && !title && !content && { mt: -2 }) }}
-          />
         </Box>
       </Grid>
     )
