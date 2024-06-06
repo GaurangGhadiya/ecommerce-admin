@@ -22,3 +22,9 @@ code:not([class*='language-']):after {
 code[class*='language-'] {
   padding: 0;
 }
+
+/* styles/globals.css */
+.tagify {
+  border-radius: 6px !important;
+  width: 100% !important;
+}
