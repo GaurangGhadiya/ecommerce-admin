@@ -16,13 +16,13 @@ import Icon from 'src/@core/components/icon'
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
 
-const FileUploaderRestrictions = () => {
+const FileUploaderRestrictions = ({ maxFiles = 1 }) => {
   // ** State
   const [files, setFiles] = useState([])
 
   // ** Hooks
   const { getRootProps, getInputProps } = useDropzone({
-    maxFiles: 2,
+    maxFiles: maxFiles,
     maxSize: 2000000,
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg', '.gif']
@@ -31,7 +31,7 @@ const FileUploaderRestrictions = () => {
       setFiles(acceptedFiles.map(file => Object.assign(file)))
     },
     onDropRejected: () => {
-      toast.error('You can only upload 2 files & maximum size of 2 MB.', {
+      toast.error(`You can only upload ${maxFiles} files & maximum size of 2 MB.`, {
         duration: 2000
       })
     }
@@ -107,7 +107,7 @@ const FileUploaderRestrictions = () => {
             Drop files here or click to upload.
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>Allowed *.jpeg, *.jpg, *.png, *.gif</Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Max 2 files and max size of 2 MB</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Max {maxFiles} files and max size of 2 MB</Typography>
         </Box>
       </div>
       {files.length ? (

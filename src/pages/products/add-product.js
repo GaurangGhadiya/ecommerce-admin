@@ -95,7 +95,7 @@ const AddProduct = () => {
         </Grid>
       </Grid>
 
-      <Grid container spacing={6}>
+      <Grid container spacing={6} mt={0}>
         <Grid item xs={12} md={8}>
           <Card>
             <CardHeader title='Product information' />
@@ -123,7 +123,7 @@ const AddProduct = () => {
             <CardContent>
               <Grid container spacing={6}>
                 <Grid item xs={12}>
-                  <FileUploaderRestrictions />
+                  <FileUploaderRestrictions maxFiles={7} />
                 </Grid>
               </Grid>
             </CardContent>
@@ -132,7 +132,7 @@ const AddProduct = () => {
             <CardHeader title='Variants' />
             <CardContent>
               <Grid container spacing={6}>
-                <Grid item xs={4.5}>
+                <Grid item xs={12} md={4.5}>
                   <CustomTextField select defaultValue='' label='Options' id='custom-select' fullWidth>
                     <MenuItem value={10}>Color</MenuItem>
                     <MenuItem value={20}>Size</MenuItem>
@@ -141,10 +141,10 @@ const AddProduct = () => {
                     Add another option
                   </Button>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} md={6}>
                   <CustomTextField fullWidth label='Value' placeholder='Enter value' />
                 </Grid>
-                <Grid item xs={1.5} mt={4}>
+                <Grid item xs={12} md={1.5} mt={4}>
                   <Button variant='tonal' color='error'>
                     <DeleteForeverIcon />
                   </Button>
@@ -160,7 +160,7 @@ const AddProduct = () => {
             <CardContent>
               <Grid container spacing={6}>
                 <Grid item xs={12}>
-                  <FileUploaderRestrictions />
+                  <FileUploaderRestrictions maxFiles={1} />
                 </Grid>
               </Grid>
             </CardContent>
