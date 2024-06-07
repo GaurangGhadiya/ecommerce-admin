@@ -28,28 +28,18 @@ import CustomChip from 'src/@core/components/mui/chip'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import CustomTextField from 'src/@core/components/mui/text-field'
 
-// ** Utils Import
 import { getInitials } from 'src/@core/utils/get-initials'
 
-// ** Actions Imports
-
-// ** Third Party Components
-import axios from 'axios'
 import TableHeader from './components/TableHeader'
 import data from './components/data'
+import { borderRadius } from '@mui/system'
 
-// ** Custom Table Components Imports
-// import TableHeader from 'src/views/apps/user/list/TableHeader'
-
-// import AddUserDrawer from 'src/views/apps/user/list/AddUserDrawer'
-
-// ** renders client column
 const userRoleObj = {
   admin: { icon: 'tabler:device-laptop', color: 'secondary' },
-  author: { icon: 'tabler:circle-check', color: 'success' },
-  editor: { icon: 'tabler:edit', color: 'info' },
-  maintainer: { icon: 'tabler:chart-pie-2', color: 'primary' },
-  subscriber: { icon: 'tabler:user', color: 'warning' }
+  watch: { icon: 'tabler:circle-check', color: 'success' },
+  shoes: { icon: 'tabler:edit', color: 'info' },
+  tshirt: { icon: 'tabler:chart-pie-2', color: 'primary' },
+  jeans: { icon: 'tabler:user', color: 'warning' }
 }
 
 const userStatusObj = {
@@ -60,25 +50,27 @@ const userStatusObj = {
 
 // ** renders client column
 const renderClient = row => {
-  if (row.avatar.length) {
-    return <CustomAvatar src={row.avatar} sx={{ mr: 2.5, width: 38, height: 38 }} />
-  } else {
-    return (
+  return (
+    <div
+      style={{
+        height: '40px',
+        width: '40px',
+        backgroundColor: '#F2F2F3',
+        borderRadius: '6px',
+        marginRight: '10px'
+      }}
+    >
       <CustomAvatar
+        src={'https://demos.pixinvent.com/vuexy-html-admin-template/assets/img/ecommerce-images/product-9.png'}
+        sx={{ mr: 2.5, width: 38, height: 38, borderRadius: 1 }}
         skin='light'
-        color={row.avatarColor}
-        sx={{ mr: 2.5, width: 38, height: 38, fontWeight: 500, fontSize: theme => theme.typography.body1.fontSize }}
-      >
-        {getInitials(row.fullName ? row.fullName : 'John Doe')}
-      </CustomAvatar>
-    )
-  }
+        color={'primary'}
+      />
+    </div>
+  )
 }
 
 const RowOptions = () => {
-  // ** Hooks
-
-  // ** State
   const [anchorEl, setAnchorEl] = useState(null)
   const rowOptionsOpen = Boolean(anchorEl)
 
@@ -91,7 +83,6 @@ const RowOptions = () => {
   }
 
   const handleDelete = () => {
-    // dispatch(deleteUser(id))
     handleRowOptionsClose()
   }
 
@@ -115,12 +106,7 @@ const RowOptions = () => {
         }}
         PaperProps={{ style: { minWidth: '8rem' } }}
       >
-        <MenuItem
-          component={Link}
-          sx={{ '& svg': { mr: 2 } }}
-          href='/apps/user/view/account'
-          onClick={handleRowOptionsClose}
-        >
+        <MenuItem sx={{ '& svg': { mr: 2 } }} onClick={handleRowOptionsClose}>
           <Icon icon='tabler:eye' fontSize={20} />
           View
         </MenuItem>
@@ -142,7 +128,7 @@ const columns = [
     flex: 0.25,
     minWidth: 280,
     field: 'fullName',
-    headerName: 'User',
+    headerName: 'Product',
     renderCell: ({ row }) => {
       const { fullName, email } = row
 
@@ -152,8 +138,6 @@ const columns = [
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
             <Typography
               noWrap
-              component={Link}
-              href='/apps/user/view/account'
               sx={{
                 fontWeight: 500,
                 textDecoration: 'none',
@@ -163,9 +147,9 @@ const columns = [
             >
               {fullName}
             </Typography>
-            <Typography noWrap variant='body2' sx={{ color: 'text.disabled' }}>
+            {/* <Typography noWrap variant='body2' sx={{ color: 'text.disabled' }}>
               {email}
-            </Typography>
+            </Typography> */}
           </Box>
         </Box>
       )
@@ -175,7 +159,7 @@ const columns = [
     flex: 0.15,
     field: 'role',
     minWidth: 170,
-    headerName: 'Role',
+    headerName: 'Category',
     renderCell: ({ row }) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -196,7 +180,7 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: 'Plan',
+    headerName: 'Price',
     field: 'currentPlan',
     renderCell: ({ row }) => {
       return (
@@ -210,7 +194,7 @@ const columns = [
     flex: 0.15,
     minWidth: 190,
     field: 'billing',
-    headerName: 'Billing',
+    headerName: 'Quantity',
     renderCell: ({ row }) => {
       return (
         <Typography noWrap sx={{ color: 'text.secondary' }}>
@@ -219,6 +203,7 @@ const columns = [
       )
     }
   },
+
   {
     flex: 0.1,
     minWidth: 110,
@@ -253,21 +238,7 @@ const ProductList = () => {
   const [plan, setPlan] = useState('')
   const [value, setValue] = useState('')
   const [status, setStatus] = useState('')
-  const [addUserOpen, setAddUserOpen] = useState(false)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
-
-  // ** Hooks
-
-  // useEffect(() => {
-  //   dispatch(
-  //     fetchData({
-  //       role,
-  //       status,
-  //       q: value,
-  //       currentPlan: plan
-  //     })
-  //   )
-  // }, [dispatch, plan, role, status, value])
 
   const handleFilter = useCallback(val => {
     setValue(val)
@@ -305,7 +276,7 @@ const ProductList = () => {
                 >
                   <MenuItem value=''>Select Status</MenuItem>
                   <MenuItem value='admin'>Published</MenuItem>
-                  <MenuItem value='author'>Inactive</MenuItem>
+                  <MenuItem value='watch'>Inactive</MenuItem>
                 </CustomTextField>
               </Grid>
               <Grid item sm={4} xs={12}>
