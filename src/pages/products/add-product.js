@@ -27,6 +27,30 @@ const AddProduct = () => {
   const [checked, setChecked] = useState(true)
   const [tags, setTags] = useState([])
 
+  const [variants, setVariants] = useState([
+    {
+      option: '',
+      value: ''
+    }
+  ])
+
+  const addVariant = () => {
+    setVariants([
+      ...variants,
+      {
+        option: '',
+        value: ''
+      }
+    ])
+  }
+
+  const deleteVariant = index => {
+    console.log('index', index)
+    let data = [...variants]
+    let newData = data?.filter((v, i) => i != index)
+    setVariants(newData)
+  }
+
   const handleTagChange = newTags => {
     setTags(newTags)
     console.log('Updated Tags:', newTags)
@@ -129,27 +153,30 @@ const AddProduct = () => {
             </CardContent>
           </Card>
           <Card style={{ marginTop: '30px' }}>
-            <CardHeader title='Variants' />
+            <CardHeader title='Variations' />
             <CardContent>
-              <Grid container spacing={6}>
-                <Grid item xs={12} md={4.5}>
-                  <CustomTextField select defaultValue='' label='Options' id='custom-select' fullWidth>
-                    <MenuItem value={10}>Color</MenuItem>
-                    <MenuItem value={20}>Size</MenuItem>
-                  </CustomTextField>
-                  <Button variant='contained' style={{ marginTop: '15px' }}>
-                    Add another option
-                  </Button>
+              {variants?.map((v, i) => (
+                <Grid container spacing={6} key={i} mb={3}>
+                  <Grid item xs={12} md={4.5}>
+                    <CustomTextField select defaultValue='' label='Options' id='custom-select' fullWidth>
+                      <MenuItem value={10}>Color</MenuItem>
+                      <MenuItem value={20}>Size</MenuItem>
+                    </CustomTextField>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <CustomTextField fullWidth label='Value' placeholder='Enter value' />
+                  </Grid>
+                  <Grid item xs={12} md={1.5} mt={4}>
+                    <Button variant='tonal' color='error' onClick={() => deleteVariant(i)}>
+                      <DeleteForeverIcon />
+                    </Button>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomTextField fullWidth label='Value' placeholder='Enter value' />
-                </Grid>
-                <Grid item xs={12} md={1.5} mt={4}>
-                  <Button variant='tonal' color='error'>
-                    <DeleteForeverIcon />
-                  </Button>
-                </Grid>
-              </Grid>
+              ))}
+
+              <Button variant='contained' style={{ marginTop: '15px' }} onClick={addVariant}>
+                Add another option
+              </Button>
             </CardContent>
           </Card>
         </Grid>
