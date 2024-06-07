@@ -28,3 +28,11 @@ code[class*='language-'] {
   border-radius: 6px !important;
   width: 100% !important;
 }
+
+.MuiDataGrid-columnHeaders {
+  background-color: transparent !important;
+}
+
+.MuiDataGrid-root {
+  border: 1px solid rgba(230, 229, 231, 1) !important;
+}

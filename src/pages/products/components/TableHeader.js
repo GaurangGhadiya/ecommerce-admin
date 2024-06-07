@@ -7,10 +7,13 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import { useRouter } from 'next/router'
 
 const TableHeader = props => {
+  const router = useRouter()
+
   // ** Props
-  const { handleFilter, toggle, value } = props
+  const { handleFilter, value } = props
 
   return (
     <Box
@@ -25,20 +28,14 @@ const TableHeader = props => {
         justifyContent: 'space-between'
       }}
     >
-      <Button color='secondary' variant='tonal' startIcon={<Icon icon='tabler:upload' />}>
-        Export
-      </Button>
+      <CustomTextField value={value} placeholder='Search Product' onChange={e => handleFilter(e.target.value)} />
       <Box sx={{ rowGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-        <CustomTextField
-          value={value}
-          sx={{ mr: 4 }}
-          placeholder='Search User'
-          onChange={e => handleFilter(e.target.value)}
-        />
-
-        <Button onClick={toggle} variant='contained' sx={{ '& svg': { mr: 2 } }}>
+        <Button color='secondary' variant='tonal' startIcon={<Icon icon='tabler:upload' />} sx={{ mr: 4 }}>
+          Export
+        </Button>
+        <Button onClick={() => router.push('/products/add-product')} variant='contained' sx={{ '& svg': { mr: 2 } }}>
           <Icon fontSize='1.125rem' icon='tabler:plus' />
-          Add New User
+          Add Product
         </Button>
       </Box>
     </Box>
