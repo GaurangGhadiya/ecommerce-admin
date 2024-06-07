@@ -125,8 +125,8 @@ const RowOptions = () => {
 
 const columns = [
   {
-    flex: 0.25,
-    minWidth: 280,
+    flex: 0.2,
+    minWidth: 270,
     field: 'fullName',
     headerName: 'Product',
     renderCell: ({ row }) => {
@@ -178,8 +178,8 @@ const columns = [
     }
   },
   {
-    flex: 0.15,
-    minWidth: 120,
+    flex: 0.09,
+    minWidth: 140,
     headerName: 'Price',
     field: 'currentPlan',
     renderCell: ({ row }) => {
@@ -191,8 +191,8 @@ const columns = [
     }
   },
   {
-    flex: 0.15,
-    minWidth: 190,
+    flex: 0.05,
+    minWidth: 150,
     field: 'billing',
     headerName: 'Quantity',
     renderCell: ({ row }) => {
@@ -200,6 +200,24 @@ const columns = [
         <Typography noWrap sx={{ color: 'text.secondary' }}>
           {row.billing}
         </Typography>
+      )
+    }
+  },
+  {
+    flex: 0.13,
+    minWidth: 130,
+    headerName: 'Stock',
+    field: 'stock',
+    renderCell: ({ row }) => {
+      return (
+        <CustomChip
+          rounded
+          skin='light'
+          size='small'
+          label={row.stock}
+          color={'warning'}
+          sx={{ textTransform: 'capitalize' }}
+        />
       )
     }
   },
