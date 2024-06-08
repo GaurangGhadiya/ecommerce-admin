@@ -12,7 +12,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 
 const TableHeader = props => {
   // ** Props
-  const { value, selectedRows, handleFilter } = props
+  const { value, selectedRows, handleFilter, toggle } = props
 
   return (
     <Box
@@ -36,7 +36,7 @@ const TableHeader = props => {
         <Button color='secondary' variant='tonal' startIcon={<Icon icon='tabler:upload' />} sx={{ mr: 4 }}>
           Export
         </Button>
-        <Button variant='contained' sx={{ '& svg': { mr: 2 } }}>
+        <Button onClick={toggle} variant='contained' sx={{ '& svg': { mr: 2 } }}>
           <Icon fontSize='1.125rem' icon='tabler:plus' />
           Add Sub Category
         </Button>

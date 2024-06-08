@@ -46,6 +46,7 @@ import data from './components/data'
 import TableHeader from './components/TableHeader'
 import { Menu } from '@mui/material'
 import { borderRadius } from '@mui/system'
+import AddCategoryDrawer from './components/AddCategoryDrawer'
 
 // ** Styled component for the link in the dataTable
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -217,6 +218,7 @@ const Categories = () => {
   const [selectedRows, setSelectedRows] = useState([])
   const [startDateRange, setStartDateRange] = useState(null)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
+  const [addUserOpen, setAddUserOpen] = useState(false)
 
   const handleFilter = val => {
     setValue(val)
@@ -247,6 +249,8 @@ const Categories = () => {
     }
   ]
 
+  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
+
   return (
     <DatePickerWrapper>
       <Grid container spacing={6}>
@@ -272,7 +276,12 @@ const Categories = () => {
         </Grid>
         <Grid item xs={12}>
           <Card>
-            <TableHeader value={value} selectedRows={selectedRows} handleFilter={handleFilter} />
+            <TableHeader
+              value={value}
+              selectedRows={selectedRows}
+              handleFilter={handleFilter}
+              toggle={toggleAddUserDrawer}
+            />
             <DataGrid
               autoHeight
               pagination
@@ -288,6 +297,7 @@ const Categories = () => {
           </Card>
         </Grid>
       </Grid>
+      <AddCategoryDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
     </DatePickerWrapper>
   )
 }
