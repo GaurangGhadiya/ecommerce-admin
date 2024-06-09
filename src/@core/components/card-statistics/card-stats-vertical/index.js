@@ -8,6 +8,7 @@ import CardContent from '@mui/material/CardContent'
 import Icon from 'src/@core/components/icon'
 import CustomChip from 'src/@core/components/mui/chip'
 import CustomAvatar from 'src/@core/components/mui/avatar'
+import { Box } from '@mui/material'
 
 const CardStatsVertical = props => {
   // ** Props
@@ -20,10 +21,10 @@ const CardStatsVertical = props => {
     avatarIcon,
     avatarSize = 44,
     iconSize = '1.75rem',
-    chipColor = 'primary',
-    avatarColor = 'primary'
+    avatarColor,
+    color
   } = props
-  const RenderChip = chipColor === 'default' ? Chip : CustomChip
+  console.log('color', color)
 
   return (
     <Card sx={{ ...sx }}>
@@ -36,21 +37,20 @@ const CardStatsVertical = props => {
         >
           <Icon icon={avatarIcon} fontSize={iconSize} />
         </CustomAvatar>
-        <Typography variant='h5' sx={{ mb: 1 }}>
+        <Typography variant='h4' sx={{ mb: 4, mt: 2 }}>
           {title}
         </Typography>
-        <Typography variant='body2' sx={{ mb: 1, color: 'text.disabled' }}>
+        <Box display={'flex'} alignItems={'end'} mb={1}>
+          <Typography variant='h3' color={color}>
+            {stats}
+          </Typography>
+          <Typography variant='h6' mb={1} ml={1}>
+            {chipText}
+          </Typography>
+        </Box>
+        <Typography variant='h6' sx={{ color: 'text.disabled', fontWeight: 600 }}>
           {subtitle}
         </Typography>
-        <Typography sx={{ mb: 3.5, color: 'text.secondary' }}>{stats}</Typography>
-        <RenderChip
-          size='small'
-          label={chipText}
-          color={chipColor}
-          {...(chipColor === 'default'
-            ? { sx: { borderRadius: '4px', color: 'text.secondary' } }
-            : { rounded: true, skin: 'light' })}
-        />
       </CardContent>
     </Card>
   )
