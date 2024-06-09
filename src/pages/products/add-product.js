@@ -128,11 +128,22 @@ const AddProduct = () => {
                 <Grid item xs={12}>
                   <CustomTextField fullWidth label='Name' placeholder='Product title' />
                 </Grid>
-                <Grid item xs={6}>
-                  <CustomTextField fullWidth type='number' label='SKU' placeholder='SKU' />
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    fullWidth
+                    type='number'
+                    label='SKU'
+                    placeholder='SKU'
+                    disabled
+
+                    // value={generateUniqueCode(10)}
+                  />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} md={4}>
                   <CustomTextField fullWidth type='number' label='Quantity' placeholder='Quantity' />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <CustomTextField fullWidth type='number' label='Max. Order Quantity' placeholder='Max. Quantity' />
                 </Grid>
                 <Grid item xs={12}>
                   <InputLabel>Description (Optional)</InputLabel>
@@ -240,6 +251,9 @@ const AddProduct = () => {
                     </Grid>
                   </>
                 )}
+                <Grid item xs={12}>
+                  <CustomTextField fullWidth type='number' label='Shipping Charge' placeholder='Shipping Charge' />
+                </Grid>
               </Grid>
             </CardContent>
           </Card>
