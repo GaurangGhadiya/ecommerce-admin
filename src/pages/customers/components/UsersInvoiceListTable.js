@@ -93,13 +93,7 @@ const columns = [
           </IconButton>
         </Tooltip>
         <Tooltip title='View'>
-          <IconButton
-            size='small'
-            // component={Link}
-            sx={{ color: 'text.secondary' }}
-
-            // href={`/apps/invoice/preview/${row.id}`}
-          >
+          <IconButton size='small' sx={{ color: 'text.secondary' }}>
             <Icon icon='tabler:eye' />
           </IconButton>
         </Tooltip>
@@ -167,13 +161,7 @@ const InvoiceListTable = ({ invoiceData }) => {
               <MenuItem onClick={handleClose}>XLSX</MenuItem>
               <MenuItem onClick={handleClose}>CSV</MenuItem>
             </Menu>
-            <CustomTextField
-              // value={value}
-              // sx={{ mr: 4 }}
-              placeholder='Search Order'
-
-              // onChange={e => handleFilter(e.target.value)}
-            />
+            <CustomTextField placeholder='Search Order' />
           </>
         }
       />
