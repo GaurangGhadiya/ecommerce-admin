@@ -15,7 +15,7 @@ import React, { useState } from 'react'
 import PageHeader from 'src/@core/components/page-header'
 import CustomChip from 'src/@core/components/mui/chip'
 import { DataGrid } from '@mui/x-data-grid'
-import orderData from './components/orderData'
+import orderData from '../../staticData/orderData'
 import Icon from 'src/@core/components/icon'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 

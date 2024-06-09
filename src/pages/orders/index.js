@@ -42,7 +42,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import data from './components/data'
+import data from '../../staticData/order'
 import TableHeader from './components/TableHeader'
 import { Menu } from '@mui/material'
 

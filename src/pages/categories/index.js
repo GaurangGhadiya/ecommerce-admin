@@ -42,11 +42,11 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import data from './components/data'
 import TableHeader from './components/TableHeader'
 import { Menu } from '@mui/material'
 import { borderRadius } from '@mui/system'
 import AddCategoryDrawer from './components/AddCategoryDrawer'
+import data from 'src/staticData/CategoryData'
 
 // ** Styled component for the link in the dataTable
 const LinkStyled = styled(Link)(({ theme }) => ({

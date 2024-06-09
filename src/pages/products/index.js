@@ -31,7 +31,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 import TableHeader from './components/TableHeader'
-import data from './components/data'
+import data from '../../staticData/product'
 import { borderRadius } from '@mui/system'
 
 const userRoleObj = {

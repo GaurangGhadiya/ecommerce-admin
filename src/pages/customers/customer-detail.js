@@ -4,7 +4,7 @@ import React from 'react'
 import PageHeader from 'src/@core/components/page-header'
 import UserViewLeft from './components/UserViewLeft'
 import UserViewRight from './components/UserViewRight'
-import invoiceData from './components/invoiceData'
+import invoiceData from '../../staticData/invoiceData'
 
 const CustomerDetail = () => {
   return (
