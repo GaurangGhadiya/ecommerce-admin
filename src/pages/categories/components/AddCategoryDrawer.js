@@ -47,34 +47,33 @@ const Header = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between'
 }))
 
-// const schema = yup.object().shape({
-//   company: yup.string().required(),
-//   billing: yup.string().required(),
-//   country: yup.string().required(),
-//   email: yup.string().email().required(),
-//   contact: yup
-//     .number()
-//     .typeError('Contact Number field is required')
-//     .min(10, obj => showErrors('Contact Number', obj.value.length, obj.min))
-//     .required(),
-//   fullName: yup
-//     .string()
-//     .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
-//     .required(),
-//   username: yup
-//     .string()
-//     .min(3, obj => showErrors('Username', obj.value.length, obj.min))
-//     .required()
-// })
+const schema = yup.object().shape({
+  name: yup.string().required(),
+  code: yup.string().required(),
+  details: yup.string().required(),
+  status: yup.string().required()
+
+  // contact: yup
+  //   .number()
+  //   .typeError('Contact Number field is required')
+  //   .min(10, obj => showErrors('Contact Number', obj.value.length, obj.min))
+  //   .required(),
+  // fullName: yup
+  //   .string()
+  //   .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
+  //   .required(),
+  // username: yup
+  //   .string()
+  //   .min(3, obj => showErrors('Username', obj.value.length, obj.min))
+  //   .required()
+})
 
 const defaultValues = {
-  email: '',
-  company: '',
-  country: '',
-  billing: '',
-  fullName: '',
-  username: '',
-  contact: Number('')
+  name: '',
+  code: '',
+  details: '',
+  status: '',
+  categoryicon: ''
 }
 
 const AddCategoryDrawer = props => {
@@ -97,9 +96,9 @@ const AddCategoryDrawer = props => {
     formState: { errors }
   } = useForm({
     defaultValues,
-    mode: 'onChange'
+    mode: 'onChange',
 
-    // resolver: yupResolver(schema)
+    resolver: yupResolver(schema)
   })
 
   const onSubmit = data => {
@@ -146,7 +145,7 @@ const AddCategoryDrawer = props => {
       <Box sx={{ p: theme => theme.spacing(0, 6, 6) }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
-            name='fullName'
+            name='name'
             control={control}
             rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
@@ -157,25 +156,25 @@ const AddCategoryDrawer = props => {
                 label='Title'
                 onChange={onChange}
                 placeholder='Enter category title'
-                error={Boolean(errors.fullName)}
-                {...(errors.fullName && { helperText: errors.fullName.message })}
+                error={Boolean(errors.name)}
+                {...(errors.name && { helperText: errors.name.message })}
               />
             )}
           />
           <Controller
-            name='username'
+            name='code'
             control={control}
             rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
               <CustomTextField
                 fullWidth
-                value={value}
                 sx={{ mb: 4 }}
                 label='Slug'
+                value={value}
                 onChange={onChange}
                 placeholder='Enter slug'
-                error={Boolean(errors.username)}
-                {...(errors.username && { helperText: errors.username.message })}
+                error={Boolean(errors.code)}
+                {...(errors.code && { helperText: errors.code.message })}
               />
             )}
           />
@@ -184,28 +183,48 @@ const AddCategoryDrawer = props => {
             <FileUploaderRestrictions maxFiles={1} />
           </Box>
 
-          <CustomTextField
-            fullWidth
-            rows={5}
-            multiline
-            label='Description'
-            placeholder='Enter description'
-            id='textarea-outlined-static'
-            sx={{ mb: 4 }}
+          <Controller
+            name='details'
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <CustomTextField
+                fullWidth
+                rows={5}
+                multiline
+                label='Description'
+                placeholder='Enter description'
+                id='textarea-outlined-static'
+                value={value}
+                onChange={onChange}
+                sx={{ mb: 4 }}
+                error={Boolean(errors.details)}
+                {...(errors.details && { helperText: errors.details.message })}
+              />
+            )}
           />
 
-          <CustomTextField
-            select
-            fullWidth
-            value={role}
-            sx={{ mb: 4 }}
-            label='Select category status'
-            onChange={e => setRole(e.target.value)}
-            SelectProps={{ value: role, onChange: e => setRole(e.target.value) }}
-          >
-            <MenuItem value='admin'>Active</MenuItem>
-            <MenuItem value='author'>Inactive</MenuItem>
-          </CustomTextField>
+          <Controller
+            name='status'
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <CustomTextField
+                select
+                fullWidth
+                value={value}
+                sx={{ mb: 4 }}
+                label='Select category status'
+                onChange={onChange}
+                SelectProps={{ value: role, onChange: e => setRole(e.target.value) }}
+                error={Boolean(errors.status)}
+                {...(errors.status && { helperText: errors.status.message })}
+              >
+                <MenuItem value='1'>Active</MenuItem>
+                <MenuItem value='0'>Inactive</MenuItem>
+              </CustomTextField>
+            )}
+          />
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button type='submit' variant='contained' sx={{ mr: 3 }}>
