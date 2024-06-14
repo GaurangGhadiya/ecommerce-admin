@@ -38,7 +38,8 @@ const schema = yup.object().shape({
   code: yup.string().required('Slug is required'),
   category_id: yup.string().required('Category is required'),
   details: yup.string().required('Description is required'),
-  status: yup.string().required('Status is required')
+  status: yup.string().required('Status is required'),
+  files: yup.array().min(1, 'File is required').max(1, 'You can only upload one file')
 })
 
 // ** Default Values
@@ -47,7 +48,8 @@ const defaultValues = {
   code: '',
   category_id: '',
   details: '',
-  status: ''
+  status: '',
+  files: []
 }
 
 const AddSubCategoryDrawer = props => {
@@ -55,8 +57,8 @@ const AddSubCategoryDrawer = props => {
   const { open, toggle } = props
 
   // ** State
-  const [category, setCategory] = useState('shoes')
-  const [status, setStatus] = useState('active')
+  const [files, setFiles] = useState([])
+  console.log(files)
 
   // ** Form Methods
   const {
@@ -79,8 +81,6 @@ const AddSubCategoryDrawer = props => {
   }
 
   const handleClose = () => {
-    setCategory('shoes')
-    setStatus('active')
     reset()
     toggle()
   }
@@ -155,11 +155,6 @@ const AddSubCategoryDrawer = props => {
                 fullWidth
                 sx={{ mb: 4 }}
                 label='Select category'
-                onChange={e => {
-                  setCategory(e.target.value)
-                  field.onChange(e)
-                }}
-                value={category}
                 error={Boolean(errors.category_id)}
                 helperText={errors.category_id?.message}
               >
@@ -170,8 +165,21 @@ const AddSubCategoryDrawer = props => {
             )}
           />
           <Box mb={4}>
-            <InputLabel>Attachment</InputLabel>
-            <FileUploaderRestrictions maxFiles={1} />
+            <Controller
+              name='files'
+              control={control}
+              render={({ field }) => (
+                <FileUploaderRestrictions
+                  maxFiles={1}
+                  files={files}
+                  setFiles={acceptedFiles => {
+                    setFiles(acceptedFiles)
+                    setValue('files', acceptedFiles)
+                  }}
+                  error={errors.files || ''}
+                />
+              )}
+            />
           </Box>
           <Controller
             name='details'
@@ -200,11 +208,6 @@ const AddSubCategoryDrawer = props => {
                 fullWidth
                 sx={{ mb: 4 }}
                 label='Select sub category status'
-                onChange={e => {
-                  setStatus(e.target.value)
-                  field.onChange(e)
-                }}
-                value={status}
                 error={Boolean(errors.status)}
                 helperText={errors.status ? errors.status.message : ''}
               >

@@ -36,3 +36,10 @@ code[class*='language-'] {
 .MuiDataGrid-root {
   border: 1px solid rgba(230, 229, 231, 1) !important;
 }
+
+.fileError {
+  color: #ea5455;
+  line-height: 1.154;
+  font-size: 0.8125rem;
+  margin: 0.25rem 0rem 0rem;
+}

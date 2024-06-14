@@ -1,10 +1,9 @@
 // ** React Imports
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
-import Button from '@mui/material/Button'
 import ListItem from '@mui/material/ListItem'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
@@ -15,17 +14,15 @@ import Icon from 'src/@core/components/icon'
 // ** Third Party Components
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
+import { Button } from '@mui/material'
 
-const FileUploaderRestrictions = ({ maxFiles = 1 }) => {
-  // ** State
-  const [files, setFiles] = useState([])
-
+const FileUploaderRestrictions = ({ maxFiles = 1, files, setFiles, error }) => {
   // ** Hooks
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: maxFiles,
     maxSize: 2000000,
     accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+      'image/*': ['.png', '.jpg', '.jpeg']
     },
     onDrop: acceptedFiles => {
       setFiles(acceptedFiles.map(file => Object.assign(file)))
@@ -55,14 +52,6 @@ const FileUploaderRestrictions = ({ maxFiles = 1 }) => {
     <ListItem key={file.name}>
       <div className='file-details'>
         <div className='file-preview'>{renderFilePreview(file)}</div>
-        <div>
-          <Typography className='file-name'>{file.name}</Typography>
-          <Typography className='file-size' variant='body2'>
-            {Math.round(file.size / 100) / 10 > 1000
-              ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb`
-              : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
-          </Typography>
-        </div>
       </div>
       <IconButton onClick={() => handleRemoveFile(file)}>
         <Icon icon='tabler:x' fontSize={20} />
@@ -106,19 +95,23 @@ const FileUploaderRestrictions = ({ maxFiles = 1 }) => {
           <Typography variant='h4' sx={{ mb: 2.5 }}>
             Drop files here or click to upload.
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Allowed *.jpeg, *.jpg, *.png, *.gif</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Allowed *.jpeg, *.jpg, *.png</Typography>
           <Typography sx={{ color: 'text.secondary' }}>Max {maxFiles} files and max size of 2 MB</Typography>
         </Box>
       </div>
+      {error && files?.length == 0 && (
+        <Typography color='error' variant='body2'>
+          {error.message}
+        </Typography>
+      )}
       {files.length ? (
         <Fragment>
           <List>{fileList}</List>
-          <div className='buttons'>
+          {/* <div className='buttons'>
             <Button color='error' variant='outlined' onClick={handleRemoveAllFiles}>
               Remove All
             </Button>
-            <Button variant='contained'>Upload Files</Button>
-          </div>
+          </div> */}
         </Fragment>
       ) : null}
     </Fragment>

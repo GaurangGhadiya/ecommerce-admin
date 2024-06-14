@@ -25,6 +25,7 @@ import Icon from 'src/@core/components/icon'
 import { useDispatch, useSelector } from 'react-redux'
 import { Divider, InputLabel } from '@mui/material'
 import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
+import toast from 'react-hot-toast'
 
 // ** Styles
 const Header = styled(Box)(({ theme }) => ({
@@ -39,7 +40,8 @@ const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
   code: yup.string().required('Code is required'),
   details: yup.string().required('Details are required'),
-  status: yup.string().required('Status is required')
+  status: yup.string().required('Status is required'),
+  files: yup.array().min(1, 'File is required').max(1, 'You can only upload one file')
 })
 
 // ** Default Form Values
@@ -48,7 +50,8 @@ const defaultValues = {
   code: '',
   details: '',
   status: '',
-  categoryicon: ''
+  categoryicon: '',
+  files: []
 }
 
 const AddCategoryDrawer = props => {
@@ -56,8 +59,8 @@ const AddCategoryDrawer = props => {
   const { open, toggle } = props
 
   // ** State
-  const [plan, setPlan] = useState('basic')
-  const [role, setRole] = useState('subscriber')
+  const [files, setFiles] = useState([])
+  console.log(files)
 
   // ** Hooks
   const {
@@ -78,8 +81,6 @@ const AddCategoryDrawer = props => {
   }
 
   const handleClose = () => {
-    setPlan('basic')
-    setRole('subscriber')
     toggle()
     reset()
   }
@@ -145,8 +146,21 @@ const AddCategoryDrawer = props => {
             )}
           />
           <Box mb={4}>
-            <InputLabel>Attachment</InputLabel>
-            <FileUploaderRestrictions maxFiles={1} />
+            <Controller
+              name='files'
+              control={control}
+              render={({ field }) => (
+                <FileUploaderRestrictions
+                  maxFiles={1}
+                  files={files}
+                  setFiles={acceptedFiles => {
+                    setFiles(acceptedFiles)
+                    setValue('files', acceptedFiles)
+                  }}
+                  error={errors.files || ''}
+                />
+              )}
+            />
           </Box>
           <Controller
             name='details'
