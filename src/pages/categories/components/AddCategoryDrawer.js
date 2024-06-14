@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
@@ -26,6 +26,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Divider, InputLabel } from '@mui/material'
 import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
 import toast from 'react-hot-toast'
+import { getCode } from 'src/network/actions/getCode'
+import { addCategory } from 'src/network/actions/addCategory'
+import { getCategory } from 'src/network/actions/getCategory'
 
 // ** Styles
 const Header = styled(Box)(({ theme }) => ({
@@ -50,17 +53,17 @@ const defaultValues = {
   code: '',
   details: '',
   status: '',
-  categoryicon: '',
   files: []
 }
 
 const AddCategoryDrawer = props => {
-  // ** Props
+  const dispatch = useDispatch()
+  const getCodeData = useSelector(store => store?.getCode?.data)
+  console.log('getCodeData', getCodeData)
   const { open, toggle } = props
 
   // ** State
   const [files, setFiles] = useState([])
-  console.log(files)
 
   // ** Hooks
   const {
@@ -74,10 +77,34 @@ const AddCategoryDrawer = props => {
     resolver: yupResolver(schema)
   })
 
+  useEffect(() => {
+    if (open) {
+      dispatch(getCode())
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (getCodeData) {
+      setValue('code', getCodeData)
+    }
+  }, [getCodeData, setValue])
+
   const onSubmit = data => {
+    const formData = new FormData()
+    formData.append('name', data?.name)
+    formData.append('code', data?.code)
+    formData.append('details', data?.details)
+    formData.append('status', data?.status)
+    formData.append('categoryicon', data?.files?.[0])
+
+    const extra = () => {
+      dispatch(getCategory())
+      toggle()
+      reset()
+    }
+
+    dispatch(addCategory(formData, extra))
     console.log(data)
-    toggle()
-    reset()
   }
 
   const handleClose = () => {
@@ -138,6 +165,7 @@ const AddCategoryDrawer = props => {
                 fullWidth
                 sx={{ mb: 4 }}
                 label='Slug'
+                disabled
                 placeholder='Enter slug'
                 error={Boolean(errors.code)}
                 helperText={errors.code ? errors.code.message : ''}

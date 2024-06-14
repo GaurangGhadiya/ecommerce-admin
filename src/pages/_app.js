@@ -51,6 +51,8 @@ import 'src/iconify-bundle/icons-bundle-react'
 
 // ** Global css styles
 import '../../styles/globals.css'
+import store from 'src/utils/store'
+import { Provider } from 'react-redux'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -105,16 +107,18 @@ const App = props => {
           <SettingsConsumer>
             {({ settings }) => {
               return (
-                <ThemeComponent settings={settings}>
-                  <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                    <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}>
-                      {getLayout(<Component {...pageProps} />)}
-                    </AclGuard>
-                  </Guard>
-                  <ReactHotToast>
-                    <Toaster position={'top-right'} />
-                  </ReactHotToast>
-                </ThemeComponent>
+                <Provider store={store}>
+                  <ThemeComponent settings={settings}>
+                    <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                      <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}>
+                        {getLayout(<Component {...pageProps} />)}
+                      </AclGuard>
+                    </Guard>
+                    <ReactHotToast>
+                      <Toaster position={'top-right'} />
+                    </ReactHotToast>
+                  </ThemeComponent>
+                </Provider>
               )
             }}
           </SettingsConsumer>

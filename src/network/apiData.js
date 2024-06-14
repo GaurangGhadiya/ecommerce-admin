@@ -1,10 +1,13 @@
 const axios = require('axios').default
 
-export const BaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+// export const BaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+export const BaseURL = 'http://192.168.29.192:3009/api'
+
+export const BaseURLImage = 'http://192.168.29.192:3009/'
 
 let defaultHeaders = {
   headers: {
-    'Content-Type': 'text/plain'
+    // 'Content-Type': 'text/json'
   }
 }
 
@@ -33,7 +36,7 @@ export const ApiPostNoAuth = (url, body) => {
       )
 
       .then(responseJson => {
-        const data = responseJson?.data?.data
+        const data = responseJson?.data
 
         console.log('data api', data)
 

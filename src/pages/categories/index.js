@@ -43,32 +43,18 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import TableHeader from './components/TableHeader'
-import { Menu } from '@mui/material'
+import { Menu, Pagination } from '@mui/material'
 import { borderRadius } from '@mui/system'
 import AddCategoryDrawer from './components/AddCategoryDrawer'
 import data from 'src/staticData/CategoryData'
-
-// ** Styled component for the link in the dataTable
-const LinkStyled = styled(Link)(({ theme }) => ({
-  textDecoration: 'none',
-  fontSize: theme.typography.body1.fontSize,
-  color: `${theme.palette.primary.main} !important`
-}))
-
-// ** Vars
-const invoiceStatusObj = {
-  Sent: { color: 'secondary', icon: 'tabler:circle-check' },
-  Paid: { color: 'success', icon: 'tabler:circle-half-2' },
-  Draft: { color: 'primary', icon: 'tabler:device-floppy' },
-  'Partial Payment': { color: 'warning', icon: 'tabler:chart-pie' },
-  'Past Due': { color: 'error', icon: 'tabler:alert-circle' },
-  Downloaded: { color: 'info', icon: 'tabler:arrow-down-circle' }
-}
+import { getCategory } from 'src/network/actions/getCategory'
+import { BaseURL } from 'src/network/apiData'
+import removeEmptyKeys from 'src/utils/ObjectClean'
 
 // ** renders client column
 const renderClient = row => {
-  if (row.avatar.length) {
-    return <CustomAvatar src={row.avatar} sx={{ mr: 2.5, width: 38, height: 38, borderRadius: '4px' }} />
+  if (row.icon) {
+    return <CustomAvatar src={BaseURL + row.icon} sx={{ mr: 2.5, width: 38, height: 38, borderRadius: '4px' }} />
   } else {
     return (
       <CustomAvatar
@@ -96,7 +82,7 @@ const defaultColumns = [
     minWidth: 320,
     headerName: 'Categories',
     renderCell: ({ row }) => {
-      const { name, companyEmail } = row
+      const { name, icon, details } = row
 
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -106,7 +92,7 @@ const defaultColumns = [
               {name}
             </Typography>
             <Typography noWrap variant='body2' sx={{ color: 'text.disabled' }}>
-              {companyEmail}
+              {details}
             </Typography>
           </Box>
         </Box>
@@ -136,7 +122,7 @@ const defaultColumns = [
     field: 'balance',
     headerName: 'Status',
     renderCell: ({ row }) => {
-      return row.balance !== 0 ? (
+      return row.status == 0 ? (
         <CustomChip rounded size='small' skin='light' color='error' label='Inactive' />
       ) : (
         <CustomChip rounded size='small' skin='light' color='success' label='Active' />
@@ -144,16 +130,6 @@ const defaultColumns = [
     }
   }
 ]
-/* eslint-disable */
-const CustomInput = forwardRef((props, ref) => {
-  const startDate = props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
-  const endDate = props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
-  const value = `${startDate}${endDate !== null ? endDate : ''}`
-  props.start === null && props.dates.length && props.setDates ? props.setDates([]) : null
-  const updatedProps = { ...props }
-  delete updatedProps.setDates
-  return <CustomTextField fullWidth inputRef={ref} {...updatedProps} label={props.label || ''} value={value} />
-})
 
 const RowOptions = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -211,31 +187,24 @@ const RowOptions = () => {
 /* eslint-enable */
 const Categories = () => {
   // ** State
-  const [dates, setDates] = useState([])
-  const [value, setValue] = useState('')
-  const [statusValue, setStatusValue] = useState('')
-  const [endDateRange, setEndDateRange] = useState(null)
-  const [selectedRows, setSelectedRows] = useState([])
-  const [startDateRange, setStartDateRange] = useState(null)
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
+  const dispatch = useDispatch()
+  const getCategoryData = useSelector(store => store.getCategory?.data)
+
+  const [filteredValue, setFilteredValue] = useState({ status: null, name: '', page: 1 })
+  console.log('getCategoryData', getCategoryData)
+
+  useEffect(() => {
+    dispatch(getCategory(removeEmptyKeys(filteredValue)))
+  }, [filteredValue])
+
   const [addUserOpen, setAddUserOpen] = useState(false)
 
-  const handleFilter = val => {
-    setValue(val)
-  }
+  const handleChangeFilter = e => {
+    const { name, value } = e.target
 
-  const handleStatusValue = e => {
-    setStatusValue(e.target.value)
+    setFilteredValue({ ...filteredValue, [name]: value })
   }
-
-  const handleOnChangeRange = dates => {
-    const [start, end] = dates
-    if (start !== null && end !== null) {
-      setDates(dates)
-    }
-    setStartDateRange(start)
-    setEndDateRange(end)
-  }
+  console.log('filter', filteredValue)
 
   const columns = [
     ...defaultColumns,
@@ -264,10 +233,13 @@ const Categories = () => {
                     select
                     fullWidth
                     label='Category Status'
-                    SelectProps={{ value: statusValue, onChange: e => handleStatusValue(e) }}
+                    name='status'
+                    SelectProps={{ value: filteredValue?.status, onChange: handleChangeFilter }}
+                    onChange={handleChangeFilter}
                   >
-                    <MenuItem value=''>Active</MenuItem>
-                    <MenuItem value='downloaded'>Inactive</MenuItem>
+                    <MenuItem value=''>Select...</MenuItem>
+                    <MenuItem value={1}>Active</MenuItem>
+                    <MenuItem value={0}>Inactive</MenuItem>
                   </CustomTextField>
                 </Grid>
               </Grid>
@@ -277,22 +249,30 @@ const Categories = () => {
         <Grid item xs={12}>
           <Card>
             <TableHeader
-              value={value}
-              selectedRows={selectedRows}
-              handleFilter={handleFilter}
+              name='name'
+              value={filteredValue?.name}
+              handleFilter={handleChangeFilter}
               toggle={toggleAddUserDrawer}
             />
             <DataGrid
               autoHeight
               pagination
               rowHeight={62}
-              rows={data}
+              rows={getCategoryData?.data || []}
               columns={columns}
               disableRowSelectionOnClick
-              pageSizeOptions={[10, 25, 50]}
-              paginationModel={paginationModel}
-              onPaginationModelChange={setPaginationModel}
-              onRowSelectionModelChange={rows => setSelectedRows(rows)}
+              hideFooter
+              hideFooterPagination
+
+              // pageSizeOptions={[10, 25, 50]}
+              // paginationModel={paginationModel}
+              // onPaginationModelChange={setPaginationModel}
+              // onRowSelectionModelChange={rows => setSelectedRows(rows)}
+            />
+            <Pagination
+              count={getCategoryData?.pagination?.totalPages}
+              page={filteredValue?.page}
+              onChange={(e, v) => setFilteredValue({ ...filteredValue, page: v })}
             />
           </Card>
         </Grid>

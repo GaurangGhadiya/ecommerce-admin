@@ -1,8 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 
 import { thunk } from 'redux-thunk' // Use Redux Thunk for async actions
-
-import rootReducer from '@/network/reducers' // Create a rootReducer
+import rootReducer from 'src/network/reducers'
 
 // import { composeWithDevTools } from "@redux-devtools/extension";
 

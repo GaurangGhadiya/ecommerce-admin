@@ -1,9 +1,12 @@
 import { combineReducers } from 'redux'
-
-// import updateFamilyMember from './updateFamilyMember'
+import getCode from './getCode'
+import addCategory from './addCategory'
+import getCategory from './getCategory'
 
 const rootReducer = combineReducers({
-  //   updateFamilyMember
+  getCode,
+  addCategory,
+  getCategory
 })
 
 export default rootReducer
