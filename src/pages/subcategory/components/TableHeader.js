@@ -12,7 +12,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 
 const TableHeader = props => {
   // ** Props
-  const { value, selectedRows, handleFilter, toggle } = props
+  const { value, handleFilter, toggle, name } = props
 
   return (
     <Box
@@ -30,7 +30,8 @@ const TableHeader = props => {
         value={value}
         sx={{ mr: 4, mb: 2 }}
         placeholder='Search Sub Category'
-        onChange={e => handleFilter(e.target.value)}
+        onChange={e => handleFilter(e)}
+        name={name}
       />
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <Button color='secondary' variant='tonal' startIcon={<Icon icon='tabler:upload' />} sx={{ mr: 4 }}>
