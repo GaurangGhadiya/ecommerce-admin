@@ -9,9 +9,12 @@ import { styled } from '@mui/material/styles'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
+import InputLabel from '@mui/material/InputLabel'
 
 // ** Custom Component Import
 import CustomTextField from 'src/@core/components/mui/text-field'
+import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -21,25 +24,7 @@ import { useForm, Controller } from 'react-hook-form'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-// ** Store Imports
-import { useDispatch, useSelector } from 'react-redux'
-import { Divider, FormLabel, InputLabel } from '@mui/material'
-import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
-import EditorControlled from 'src/@core/components/editor'
-
-// ** Actions Imports
-// import { addUser } from 'src/store/apps/user'
-
-const showErrors = (field, valueLen, min) => {
-  if (valueLen === 0) {
-    return `${field} field is required`
-  } else if (valueLen > 0 && valueLen < min) {
-    return `${field} must be at least ${min} characters`
-  } else {
-    return ''
-  }
-}
-
+// ** Styles
 const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -47,34 +32,22 @@ const Header = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between'
 }))
 
-// const schema = yup.object().shape({
-//   company: yup.string().required(),
-//   billing: yup.string().required(),
-//   country: yup.string().required(),
-//   email: yup.string().email().required(),
-//   contact: yup
-//     .number()
-//     .typeError('Contact Number field is required')
-//     .min(10, obj => showErrors('Contact Number', obj.value.length, obj.min))
-//     .required(),
-//   fullName: yup
-//     .string()
-//     .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
-//     .required(),
-//   username: yup
-//     .string()
-//     .min(3, obj => showErrors('Username', obj.value.length, obj.min))
-//     .required()
-// })
+// ** Validation Schema
+const schema = yup.object().shape({
+  name: yup.string().required('Title is required'),
+  code: yup.string().required('Slug is required'),
+  category_id: yup.string().required('Category is required'),
+  details: yup.string().required('Description is required'),
+  status: yup.string().required('Status is required')
+})
 
+// ** Default Values
 const defaultValues = {
-  email: '',
-  company: '',
-  country: '',
-  billing: '',
-  fullName: '',
-  username: '',
-  contact: Number('')
+  name: '',
+  code: '',
+  category_id: '',
+  details: '',
+  status: ''
 }
 
 const AddSubCategoryDrawer = props => {
@@ -82,37 +55,34 @@ const AddSubCategoryDrawer = props => {
   const { open, toggle } = props
 
   // ** State
-  const [plan, setPlan] = useState('basic')
-  const [role, setRole] = useState('subscriber')
+  const [category, setCategory] = useState('shoes')
+  const [status, setStatus] = useState('active')
 
-  // ** Hooks
-  //   const dispatch = useDispatch()
-
+  // ** Form Methods
   const {
     reset,
     control,
     setValue,
-    setError,
     handleSubmit,
     formState: { errors }
   } = useForm({
     defaultValues,
-    mode: 'onChange'
-
-    // resolver: yupResolver(schema)
+    mode: 'onChange',
+    resolver: yupResolver(schema)
   })
 
+  // ** Handlers
   const onSubmit = data => {
+    console.log(data)
     toggle()
     reset()
   }
 
   const handleClose = () => {
-    setPlan('basic')
-    setRole('subscriber')
-    setValue('contact', Number(''))
-    toggle()
+    setCategory('shoes')
+    setStatus('active')
     reset()
+    toggle()
   }
 
   return (
@@ -146,80 +116,103 @@ const AddSubCategoryDrawer = props => {
       <Box sx={{ p: theme => theme.spacing(0, 6, 6) }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
-            name='fullName'
+            name='name'
             control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
+            render={({ field }) => (
               <CustomTextField
+                {...field}
                 fullWidth
-                value={value}
                 sx={{ mb: 4 }}
                 label='Title'
-                onChange={onChange}
                 placeholder='Enter category title'
-                error={Boolean(errors.fullName)}
-                {...(errors.fullName && { helperText: errors.fullName.message })}
+                error={Boolean(errors.name)}
+                helperText={errors.name?.message}
               />
             )}
           />
           <Controller
-            name='username'
+            name='code'
             control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
+            render={({ field }) => (
               <CustomTextField
+                {...field}
                 fullWidth
-                value={value}
                 sx={{ mb: 4 }}
                 label='Slug'
-                onChange={onChange}
                 placeholder='Enter slug'
-                error={Boolean(errors.username)}
-                {...(errors.username && { helperText: errors.username.message })}
+                error={Boolean(errors.code)}
+                helperText={errors.code?.message}
               />
             )}
           />
-          <CustomTextField
-            select
-            fullWidth
-            value={role}
-            sx={{ mb: 4 }}
-            label='Select category'
-            onChange={e => setRole(e.target.value)}
-            SelectProps={{ value: role, onChange: e => setRole(e.target.value) }}
-          >
-            <MenuItem value='admin'>Shoes</MenuItem>
-            <MenuItem value='author'>T-shite</MenuItem>
-            <MenuItem value='Jeans'>Jeans</MenuItem>
-          </CustomTextField>
+          <Controller
+            name='category_id'
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                select
+                fullWidth
+                sx={{ mb: 4 }}
+                label='Select category'
+                onChange={e => {
+                  setCategory(e.target.value)
+                  field.onChange(e)
+                }}
+                value={category}
+                error={Boolean(errors.category_id)}
+                helperText={errors.category_id?.message}
+              >
+                <MenuItem value='shoes'>Shoes</MenuItem>
+                <MenuItem value='tshirt'>T-shirt</MenuItem>
+                <MenuItem value='jeans'>Jeans</MenuItem>
+              </CustomTextField>
+            )}
+          />
           <Box mb={4}>
             <InputLabel>Attachment</InputLabel>
             <FileUploaderRestrictions maxFiles={1} />
           </Box>
-
-          <CustomTextField
-            fullWidth
-            rows={5}
-            multiline
-            label='Description'
-            placeholder='Enter description'
-            id='textarea-outlined-static'
-            sx={{ mb: 4 }}
+          <Controller
+            name='details'
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                fullWidth
+                rows={5}
+                multiline
+                label='Description'
+                placeholder='Enter description'
+                error={Boolean(errors.details)}
+                helperText={errors.details?.message}
+                sx={{ mb: 4 }}
+              />
+            )}
           />
-
-          <CustomTextField
-            select
-            fullWidth
-            value={role}
-            sx={{ mb: 4 }}
-            label='Select sub category status'
-            onChange={e => setRole(e.target.value)}
-            SelectProps={{ value: role, onChange: e => setRole(e.target.value) }}
-          >
-            <MenuItem value='admin'>Active</MenuItem>
-            <MenuItem value='author'>Inactive</MenuItem>
-          </CustomTextField>
-
+          <Controller
+            name='status'
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                select
+                fullWidth
+                sx={{ mb: 4 }}
+                label='Select sub category status'
+                onChange={e => {
+                  setStatus(e.target.value)
+                  field.onChange(e)
+                }}
+                value={status}
+                error={Boolean(errors.status)}
+                helperText={errors.status ? errors.status.message : ''}
+              >
+                <MenuItem value='active'>Active</MenuItem>
+                <MenuItem value='inactive'>Inactive</MenuItem>
+              </CustomTextField>
+            )}
+          />
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button type='submit' variant='contained' sx={{ mr: 3 }}>
               Add
