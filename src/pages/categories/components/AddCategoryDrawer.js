@@ -23,23 +23,10 @@ import Icon from 'src/@core/components/icon'
 
 // ** Store Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { Divider, FormLabel, InputLabel } from '@mui/material'
+import { Divider, InputLabel } from '@mui/material'
 import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
-import EditorControlled from 'src/@core/components/editor'
 
-// ** Actions Imports
-// import { addUser } from 'src/store/apps/user'
-
-const showErrors = (field, valueLen, min) => {
-  if (valueLen === 0) {
-    return `${field} field is required`
-  } else if (valueLen > 0 && valueLen < min) {
-    return `${field} must be at least ${min} characters`
-  } else {
-    return ''
-  }
-}
-
+// ** Styles
 const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -47,27 +34,15 @@ const Header = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between'
 }))
 
+// ** Validation Schema
 const schema = yup.object().shape({
-  name: yup.string().required(),
-  code: yup.string().required(),
-  details: yup.string().required(),
-  status: yup.string().required()
-
-  // contact: yup
-  //   .number()
-  //   .typeError('Contact Number field is required')
-  //   .min(10, obj => showErrors('Contact Number', obj.value.length, obj.min))
-  //   .required(),
-  // fullName: yup
-  //   .string()
-  //   .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
-  //   .required(),
-  // username: yup
-  //   .string()
-  //   .min(3, obj => showErrors('Username', obj.value.length, obj.min))
-  //   .required()
+  name: yup.string().required('Name is required'),
+  code: yup.string().required('Code is required'),
+  details: yup.string().required('Details are required'),
+  status: yup.string().required('Status is required')
 })
 
+// ** Default Form Values
 const defaultValues = {
   name: '',
   code: '',
@@ -85,23 +60,19 @@ const AddCategoryDrawer = props => {
   const [role, setRole] = useState('subscriber')
 
   // ** Hooks
-  //   const dispatch = useDispatch()
-
   const {
     reset,
     control,
     setValue,
-    setError,
     handleSubmit,
     formState: { errors }
   } = useForm({
     defaultValues,
-    mode: 'onChange',
-
     resolver: yupResolver(schema)
   })
 
   const onSubmit = data => {
+    console.log(data)
     toggle()
     reset()
   }
@@ -109,7 +80,6 @@ const AddCategoryDrawer = props => {
   const handleClose = () => {
     setPlan('basic')
     setRole('subscriber')
-    setValue('contact', Number(''))
     toggle()
     reset()
   }
@@ -147,34 +117,30 @@ const AddCategoryDrawer = props => {
           <Controller
             name='name'
             control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
+            render={({ field }) => (
               <CustomTextField
                 fullWidth
-                value={value}
                 sx={{ mb: 4 }}
                 label='Title'
-                onChange={onChange}
                 placeholder='Enter category title'
                 error={Boolean(errors.name)}
-                {...(errors.name && { helperText: errors.name.message })}
+                helperText={errors.name ? errors.name.message : ''}
+                {...field}
               />
             )}
           />
           <Controller
             name='code'
             control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
+            render={({ field }) => (
               <CustomTextField
                 fullWidth
                 sx={{ mb: 4 }}
                 label='Slug'
-                value={value}
-                onChange={onChange}
                 placeholder='Enter slug'
                 error={Boolean(errors.code)}
-                {...(errors.code && { helperText: errors.code.message })}
+                helperText={errors.code ? errors.code.message : ''}
+                {...field}
               />
             )}
           />
@@ -182,12 +148,10 @@ const AddCategoryDrawer = props => {
             <InputLabel>Attachment</InputLabel>
             <FileUploaderRestrictions maxFiles={1} />
           </Box>
-
           <Controller
             name='details'
             control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
+            render={({ field }) => (
               <CustomTextField
                 fullWidth
                 rows={5}
@@ -195,37 +159,31 @@ const AddCategoryDrawer = props => {
                 label='Description'
                 placeholder='Enter description'
                 id='textarea-outlined-static'
-                value={value}
-                onChange={onChange}
-                sx={{ mb: 4 }}
                 error={Boolean(errors.details)}
-                {...(errors.details && { helperText: errors.details.message })}
+                helperText={errors.details ? errors.details.message : ''}
+                {...field}
+                sx={{ mb: 4 }}
               />
             )}
           />
-
           <Controller
             name='status'
             control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
+            render={({ field }) => (
               <CustomTextField
                 select
                 fullWidth
-                value={value}
                 sx={{ mb: 4 }}
                 label='Select category status'
-                onChange={onChange}
-                SelectProps={{ value: role, onChange: e => setRole(e.target.value) }}
                 error={Boolean(errors.status)}
-                {...(errors.status && { helperText: errors.status.message })}
+                helperText={errors.status ? errors.status.message : ''}
+                {...field}
               >
                 <MenuItem value='1'>Active</MenuItem>
                 <MenuItem value='0'>Inactive</MenuItem>
               </CustomTextField>
             )}
           />
-
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button type='submit' variant='contained' sx={{ mr: 3 }}>
               Add
