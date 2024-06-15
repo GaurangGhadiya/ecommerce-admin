@@ -262,8 +262,8 @@ const AddSubCategoryDrawer = props => {
                 error={Boolean(errors.status)}
                 helperText={errors.status ? errors.status.message : ''}
               >
-                <MenuItem value='active'>Active</MenuItem>
-                <MenuItem value='inactive'>Inactive</MenuItem>
+                <MenuItem value={1}>Active</MenuItem>
+                <MenuItem value={0}>Inactive</MenuItem>
               </CustomTextField>
             )}
           />

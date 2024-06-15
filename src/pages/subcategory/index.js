@@ -101,12 +101,9 @@ const defaultColumns = [
   },
   {
     flex: 0.17,
-    field: 'role',
+    field: 'category_name',
     minWidth: 190,
-    headerName: 'Category',
-    renderCell: ({ row }) => {
-      return <Box sx={{ display: 'flex', alignItems: 'center' }}>jjk</Box>
-    }
+    headerName: 'Category'
   },
   {
     flex: 0.15,
