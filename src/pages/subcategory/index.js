@@ -44,39 +44,17 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import data from '../../staticData/subcategory'
 import TableHeader from './components/TableHeader'
-import { Menu } from '@mui/material'
+import { Menu, Pagination } from '@mui/material'
 import { borderRadius } from '@mui/system'
 import AddSubCategoryDrawer from './components/AddSubCategoryDrawer'
-
-// ** Styled component for the link in the dataTable
-const LinkStyled = styled(Link)(({ theme }) => ({
-  textDecoration: 'none',
-  fontSize: theme.typography.body1.fontSize,
-  color: `${theme.palette.primary.main} !important`
-}))
-
-const userRoleObj = {
-  admin: { icon: 'tabler:device-laptop', color: 'secondary' },
-  watch: { icon: 'tabler:circle-check', color: 'success' },
-  shoes: { icon: 'tabler:edit', color: 'info' },
-  tshirt: { icon: 'tabler:chart-pie-2', color: 'primary' },
-  jeans: { icon: 'tabler:user', color: 'warning' }
-}
-
-// ** Vars
-const invoiceStatusObj = {
-  Sent: { color: 'secondary', icon: 'tabler:circle-check' },
-  Paid: { color: 'success', icon: 'tabler:circle-half-2' },
-  Draft: { color: 'primary', icon: 'tabler:device-floppy' },
-  'Partial Payment': { color: 'warning', icon: 'tabler:chart-pie' },
-  'Past Due': { color: 'error', icon: 'tabler:alert-circle' },
-  Downloaded: { color: 'info', icon: 'tabler:arrow-down-circle' }
-}
+import removeEmptyKeys from 'src/utils/ObjectClean'
+import { getSubCategory } from 'src/network/actions/getSubCategory'
+import { getCategoryList } from 'src/network/actions/getCategoryList'
 
 // ** renders client column
 const renderClient = row => {
-  if (row.avatar.length) {
-    return <CustomAvatar src={row.avatar} sx={{ mr: 2.5, width: 38, height: 38, borderRadius: '4px' }} />
+  if (row.icon?.length) {
+    return <CustomAvatar src={row.icon} sx={{ mr: 2.5, width: 38, height: 38, borderRadius: '4px' }} />
   } else {
     return (
       <CustomAvatar
@@ -104,7 +82,7 @@ const defaultColumns = [
     minWidth: 320,
     headerName: 'Sub Categories',
     renderCell: ({ row }) => {
-      const { name, companyEmail } = row
+      const { name, details } = row
 
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -114,7 +92,7 @@ const defaultColumns = [
               {name}
             </Typography>
             <Typography noWrap variant='body2' sx={{ color: 'text.disabled' }}>
-              {companyEmail}
+              {details}
             </Typography>
           </Box>
         </Box>
@@ -127,20 +105,7 @@ const defaultColumns = [
     minWidth: 190,
     headerName: 'Category',
     renderCell: ({ row }) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <CustomAvatar
-            skin='light'
-            sx={{ mr: 4, width: 30, height: 30 }}
-            color={userRoleObj[row.role].color || 'primary'}
-          >
-            <Icon icon={userRoleObj[row.role].icon} />
-          </CustomAvatar>
-          <Typography noWrap sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
-            {row.role}
-          </Typography>
-        </Box>
-      )
+      return <Box sx={{ display: 'flex', alignItems: 'center' }}>jjk</Box>
     }
   },
   {
@@ -165,7 +130,7 @@ const defaultColumns = [
     field: 'balance',
     headerName: 'Status',
     renderCell: ({ row }) => {
-      return row.balance !== 0 ? (
+      return row.status == 0 ? (
         <CustomChip rounded size='small' skin='light' color='error' label='Inactive' />
       ) : (
         <CustomChip rounded size='small' skin='light' color='success' label='Active' />
@@ -173,18 +138,8 @@ const defaultColumns = [
     }
   }
 ]
-/* eslint-disable */
-const CustomInput = forwardRef((props, ref) => {
-  const startDate = props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
-  const endDate = props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
-  const value = `${startDate}${endDate !== null ? endDate : ''}`
-  props.start === null && props.dates.length && props.setDates ? props.setDates([]) : null
-  const updatedProps = { ...props }
-  delete updatedProps.setDates
-  return <CustomTextField fullWidth inputRef={ref} {...updatedProps} label={props.label || ''} value={value} />
-})
 
-const RowOptions = () => {
+const RowOptions = ({ id, toggle, setEditData }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const rowOptionsOpen = Boolean(anchorEl)
 
@@ -220,18 +175,25 @@ const RowOptions = () => {
         }}
         PaperProps={{ style: { minWidth: '8rem' } }}
       >
-        <MenuItem sx={{ '& svg': { mr: 2 } }} onClick={handleRowOptionsClose}>
+        {/* <MenuItem sx={{ '& svg': { mr: 2 } }} onClick={handleRowOptionsClose}>
           <Icon icon='tabler:eye' fontSize={20} />
           View
-        </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
+        </MenuItem> */}
+        <MenuItem
+          onClick={() => {
+            handleRowOptionsClose()
+            setEditData(id)
+            toggle()
+          }}
+          sx={{ '& svg': { mr: 2 } }}
+        >
           <Icon icon='tabler:edit' fontSize={20} />
           Edit
         </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
+        {/* <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
           <Icon icon='tabler:trash' fontSize={20} />
           Delete
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
     </>
   )
@@ -240,30 +202,28 @@ const RowOptions = () => {
 /* eslint-enable */
 const SubCategories = () => {
   // ** State
-  const [dates, setDates] = useState([])
-  const [value, setValue] = useState('')
-  const [statusValue, setStatusValue] = useState('')
-  const [endDateRange, setEndDateRange] = useState(null)
-  const [selectedRows, setSelectedRows] = useState([])
-  const [startDateRange, setStartDateRange] = useState(null)
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
+  const dispatch = useDispatch()
+
+  const getSubCategoryData = useSelector(store => store.getSubCategory?.data)
+  const getCategoryData = useSelector(store => store?.getCategoryList?.data)
+
+  console.log('getSubCategoryData', getSubCategoryData)
+
   const [addUserOpen, setAddUserOpen] = useState(false)
+  const [editData, setEditData] = useState({})
+  const [filteredValue, setFilteredValue] = useState({ status: null, name: '', page: 1, category_id: null })
 
-  const handleFilter = val => {
-    setValue(val)
-  }
+  useEffect(() => {
+    dispatch(getSubCategory(removeEmptyKeys(filteredValue)))
+  }, [filteredValue])
+  useEffect(() => {
+    dispatch(getCategoryList())
+  }, [])
 
-  const handleStatusValue = e => {
-    setStatusValue(e.target.value)
-  }
+  const handleChangeFilter = e => {
+    const { name, value } = e.target
 
-  const handleOnChangeRange = dates => {
-    const [start, end] = dates
-    if (start !== null && end !== null) {
-      setDates(dates)
-    }
-    setStartDateRange(start)
-    setEndDateRange(end)
+    setFilteredValue({ ...filteredValue, [name]: value })
   }
 
   const columns = [
@@ -274,7 +234,7 @@ const SubCategories = () => {
       sortable: false,
       field: 'actions',
       headerName: 'Actions',
-      renderCell: ({ row }) => <RowOptions id={row.id} />
+      renderCell: ({ row }) => <RowOptions id={row} toggle={toggleAddUserDrawer} setEditData={setEditData} />
     }
   ]
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
@@ -292,10 +252,13 @@ const SubCategories = () => {
                     select
                     fullWidth
                     label='Sub Category Status'
-                    SelectProps={{ value: statusValue, onChange: e => handleStatusValue(e) }}
+                    name='status'
+                    SelectProps={{ value: filteredValue?.status, onChange: handleChangeFilter }}
+                    onChange={handleChangeFilter}
                   >
-                    <MenuItem value=''>Active</MenuItem>
-                    <MenuItem value='downloaded'>Inactive</MenuItem>
+                    <MenuItem value=''>Select...</MenuItem>
+                    <MenuItem value={1}>Active</MenuItem>
+                    <MenuItem value={0}>Inactive</MenuItem>
                   </CustomTextField>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -303,12 +266,16 @@ const SubCategories = () => {
                     select
                     fullWidth
                     label='Category'
-                    SelectProps={{ value: statusValue, onChange: e => handleStatusValue(e) }}
+                    name='category_id'
+                    SelectProps={{ value: filteredValue?.category_id, onChange: handleChangeFilter }}
+                    onChange={handleChangeFilter}
                   >
-                    <MenuItem value=''>Shoes</MenuItem>
-                    <MenuItem value='downloaded'>T-Shirt</MenuItem>
-                    <MenuItem value='downloaded2'>Jeans</MenuItem>
-                    <MenuItem value='downloaded1'>Watch</MenuItem>
+                    <MenuItem value=''>Select...</MenuItem>
+                    {getCategoryData?.map(v => (
+                      <MenuItem value={v?.id} key={v?.id}>
+                        {v?.name}
+                      </MenuItem>
+                    ))}
                   </CustomTextField>
                 </Grid>
               </Grid>
@@ -318,27 +285,36 @@ const SubCategories = () => {
         <Grid item xs={12}>
           <Card>
             <TableHeader
-              value={value}
-              selectedRows={selectedRows}
-              handleFilter={handleFilter}
+              name='name'
+              value={filteredValue?.name}
+              handleFilter={handleChangeFilter}
               toggle={toggleAddUserDrawer}
             />
             <DataGrid
               autoHeight
               pagination
               rowHeight={62}
-              rows={data}
+              rows={getSubCategoryData?.data || []}
               columns={columns}
               disableRowSelectionOnClick
-              pageSizeOptions={[10, 25, 50]}
-              paginationModel={paginationModel}
-              onPaginationModelChange={setPaginationModel}
-              onRowSelectionModelChange={rows => setSelectedRows(rows)}
+              hideFooterPagination
+              hideFooter
+            />
+            <Pagination
+              style={{ float: 'right', margin: '15px 0' }}
+              count={getSubCategoryData?.pagination?.totalPages}
+              page={filteredValue?.page}
+              onChange={(e, v) => setFilteredValue({ ...filteredValue, page: v })}
             />
           </Card>
         </Grid>
       </Grid>
-      <AddSubCategoryDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
+      <AddSubCategoryDrawer
+        open={addUserOpen}
+        toggle={toggleAddUserDrawer}
+        editData={editData}
+        setEditData={setEditData}
+      />
     </DatePickerWrapper>
   )
 }

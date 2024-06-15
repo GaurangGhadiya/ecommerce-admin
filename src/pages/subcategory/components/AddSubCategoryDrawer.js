@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
@@ -23,6 +23,11 @@ import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import { getCode } from 'src/network/actions/getCode'
+import { useDispatch, useSelector } from 'react-redux'
+import { getCategoryList } from 'src/network/actions/getCategoryList'
+import { addSubCategory } from 'src/network/actions/addSubCategory'
+import removeEmptyKeys from 'src/utils/ObjectClean'
 
 // ** Styles
 const Header = styled(Box)(({ theme }) => ({
@@ -54,7 +59,11 @@ const defaultValues = {
 
 const AddSubCategoryDrawer = props => {
   // ** Props
-  const { open, toggle } = props
+  const { open, toggle, editData, setEditData } = props
+  const dispatch = useDispatch()
+  const getCodeData = useSelector(store => store?.getCode?.data)
+  const getCategoryData = useSelector(store => store?.getCategoryList?.data)
+  console.log('getCategoryData', getCategoryData)
 
   // ** State
   const [files, setFiles] = useState([])
@@ -73,16 +82,55 @@ const AddSubCategoryDrawer = props => {
     resolver: yupResolver(schema)
   })
 
+  useEffect(() => {
+    if (open) {
+      dispatch(getCode())
+      dispatch(getCategoryList())
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (editData) {
+      setValue('code', editData?.code)
+      setValue('details', editData?.details)
+      setValue('category_id', editData?.category_id)
+      setValue('name', editData?.name)
+      setValue('status', editData?.status)
+      setValue('files', editData?.icon)
+    }
+  }, [editData])
+
+  useEffect(() => {
+    if (getCodeData && !editData) {
+      setValue('code', getCodeData)
+    }
+  }, [getCodeData, setValue])
+
   // ** Handlers
   const onSubmit = data => {
-    console.log(data)
-    toggle()
-    reset()
+    const formData = new FormData()
+    formData.append('name', data?.name)
+    formData.append('code', data?.code)
+    formData.append('details', data?.details)
+    formData.append('status', data?.status)
+    formData.append('category_id', data?.category_id)
+    formData.append('categoryicon', data?.files?.[0])
+
+    const extra = () => {
+      // dispatch(getCategory())
+      dispatch(getSubCategory({}))
+      toggle()
+      reset()
+      setEditData(null)
+    }
+
+    dispatch(addSubCategory(formData, extra))
   }
 
   const handleClose = () => {
     reset()
     toggle()
+    setEditData(null)
   }
 
   return (
@@ -138,6 +186,7 @@ const AddSubCategoryDrawer = props => {
                 {...field}
                 fullWidth
                 sx={{ mb: 4 }}
+                disabled
                 label='Slug'
                 placeholder='Enter slug'
                 error={Boolean(errors.code)}
@@ -158,9 +207,11 @@ const AddSubCategoryDrawer = props => {
                 error={Boolean(errors.category_id)}
                 helperText={errors.category_id?.message}
               >
-                <MenuItem value='shoes'>Shoes</MenuItem>
-                <MenuItem value='tshirt'>T-shirt</MenuItem>
-                <MenuItem value='jeans'>Jeans</MenuItem>
+                {getCategoryData?.map(v => (
+                  <MenuItem value={v?.id} key={v?.id}>
+                    {v?.name}
+                  </MenuItem>
+                ))}
               </CustomTextField>
             )}
           />
