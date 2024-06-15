@@ -131,7 +131,8 @@ const defaultColumns = [
   }
 ]
 
-const RowOptions = () => {
+const RowOptions = ({ id, toggle, setEditData }) => {
+  console.log('toggleAddUserDrawer', toggle)
   const [anchorEl, setAnchorEl] = useState(null)
   const rowOptionsOpen = Boolean(anchorEl)
 
@@ -167,18 +168,25 @@ const RowOptions = () => {
         }}
         PaperProps={{ style: { minWidth: '8rem' } }}
       >
-        <MenuItem sx={{ '& svg': { mr: 2 } }} onClick={handleRowOptionsClose}>
+        {/* <MenuItem sx={{ '& svg': { mr: 2 } }} onClick={handleRowOptionsClose}>
           <Icon icon='tabler:eye' fontSize={20} />
           View
-        </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
+        </MenuItem> */}
+        <MenuItem
+          onClick={() => {
+            handleRowOptionsClose()
+            setEditData(id)
+            toggle()
+          }}
+          sx={{ '& svg': { mr: 2 } }}
+        >
           <Icon icon='tabler:edit' fontSize={20} />
           Edit
         </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
+        {/* <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
           <Icon icon='tabler:trash' fontSize={20} />
           Delete
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
     </>
   )
@@ -191,13 +199,13 @@ const Categories = () => {
   const getCategoryData = useSelector(store => store.getCategory?.data)
 
   const [filteredValue, setFilteredValue] = useState({ status: null, name: '', page: 1 })
+  const [addUserOpen, setAddUserOpen] = useState(false)
+  const [editData, setEditData] = useState({})
   console.log('getCategoryData', getCategoryData)
 
   useEffect(() => {
     dispatch(getCategory(removeEmptyKeys(filteredValue)))
   }, [filteredValue])
-
-  const [addUserOpen, setAddUserOpen] = useState(false)
 
   const handleChangeFilter = e => {
     const { name, value } = e.target
@@ -205,6 +213,10 @@ const Categories = () => {
     setFilteredValue({ ...filteredValue, [name]: value })
   }
   console.log('filter', filteredValue)
+
+  const toggleAddUserDrawer = () => {
+    setAddUserOpen(!addUserOpen)
+  }
 
   const columns = [
     ...defaultColumns,
@@ -214,11 +226,9 @@ const Categories = () => {
       sortable: false,
       field: 'actions',
       headerName: 'Actions',
-      renderCell: ({ row }) => <RowOptions id={row.id} />
+      renderCell: ({ row }) => <RowOptions id={row} toggle={toggleAddUserDrawer} setEditData={setEditData} />
     }
   ]
-
-  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
 
   return (
     <DatePickerWrapper>
@@ -263,13 +273,9 @@ const Categories = () => {
               disableRowSelectionOnClick
               hideFooter
               hideFooterPagination
-
-              // pageSizeOptions={[10, 25, 50]}
-              // paginationModel={paginationModel}
-              // onPaginationModelChange={setPaginationModel}
-              // onRowSelectionModelChange={rows => setSelectedRows(rows)}
             />
             <Pagination
+              style={{ float: 'right', margin: '15px 0' }}
               count={getCategoryData?.pagination?.totalPages}
               page={filteredValue?.page}
               onChange={(e, v) => setFilteredValue({ ...filteredValue, page: v })}
@@ -277,7 +283,12 @@ const Categories = () => {
           </Card>
         </Grid>
       </Grid>
-      <AddCategoryDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
+      <AddCategoryDrawer
+        open={addUserOpen}
+        toggle={toggleAddUserDrawer}
+        editData={editData}
+        setEditData={setEditData}
+      />
     </DatePickerWrapper>
   )
 }

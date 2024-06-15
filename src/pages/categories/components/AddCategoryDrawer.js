@@ -59,8 +59,8 @@ const defaultValues = {
 const AddCategoryDrawer = props => {
   const dispatch = useDispatch()
   const getCodeData = useSelector(store => store?.getCode?.data)
-  console.log('getCodeData', getCodeData)
-  const { open, toggle } = props
+  const { open, toggle, editData, setEditData } = props
+  console.log('editData', editData)
 
   // ** State
   const [files, setFiles] = useState([])
@@ -84,10 +84,19 @@ const AddCategoryDrawer = props => {
   }, [open])
 
   useEffect(() => {
-    if (getCodeData) {
+    if (getCodeData && !editData) {
       setValue('code', getCodeData)
     }
   }, [getCodeData, setValue])
+  useEffect(() => {
+    if (editData) {
+      setValue('code', editData?.code)
+      setValue('details', editData?.details)
+      setValue('name', editData?.name)
+      setValue('status', editData?.status)
+      setValue('files', editData?.icon)
+    }
+  }, [editData])
 
   const onSubmit = data => {
     const formData = new FormData()
@@ -101,6 +110,7 @@ const AddCategoryDrawer = props => {
       dispatch(getCategory())
       toggle()
       reset()
+      setEditData(null)
     }
 
     dispatch(addCategory(formData, extra))
@@ -110,6 +120,7 @@ const AddCategoryDrawer = props => {
   const handleClose = () => {
     toggle()
     reset()
+    setEditData(null)
   }
 
   return (
