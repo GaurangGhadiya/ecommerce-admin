@@ -33,20 +33,12 @@ import { getInitials } from 'src/@core/utils/get-initials'
 import TableHeader from './components/TableHeader'
 import data from '../../staticData/product'
 import { borderRadius } from '@mui/system'
-
-const userRoleObj = {
-  admin: { icon: 'tabler:device-laptop', color: 'secondary' },
-  watch: { icon: 'tabler:circle-check', color: 'success' },
-  shoes: { icon: 'tabler:edit', color: 'info' },
-  tshirt: { icon: 'tabler:chart-pie-2', color: 'primary' },
-  jeans: { icon: 'tabler:user', color: 'warning' }
-}
-
-const userStatusObj = {
-  active: 'success',
-  pending: 'warning',
-  inactive: 'secondary'
-}
+import { getProducts } from 'src/network/actions/getProducts'
+import { BaseURLImage } from 'src/network/apiData'
+import { Pagination } from '@mui/material'
+import { getCategoryList } from 'src/network/actions/getCategoryList'
+import removeEmptyKeys from 'src/utils/ObjectClean'
+import { useRouter } from 'next/router'
 
 // ** renders client column
 const renderClient = row => {
@@ -61,7 +53,7 @@ const renderClient = row => {
       }}
     >
       <CustomAvatar
-        src={'https://demos.pixinvent.com/vuexy-html-admin-template/assets/img/ecommerce-images/product-9.png'}
+        src={BaseURLImage + row?.thumbnail}
         sx={{ mr: 2.5, width: 38, height: 38, borderRadius: 1 }}
         skin='light'
         color={'primary'}
@@ -70,7 +62,8 @@ const renderClient = row => {
   )
 }
 
-const RowOptions = () => {
+const RowOptions = ({ id }) => {
+  const router = useRouter()
   const [anchorEl, setAnchorEl] = useState(null)
   const rowOptionsOpen = Boolean(anchorEl)
 
@@ -106,18 +99,24 @@ const RowOptions = () => {
         }}
         PaperProps={{ style: { minWidth: '8rem' } }}
       >
-        <MenuItem sx={{ '& svg': { mr: 2 } }} onClick={handleRowOptionsClose}>
+        {/* <MenuItem sx={{ '& svg': { mr: 2 } }} onClick={handleRowOptionsClose}>
           <Icon icon='tabler:eye' fontSize={20} />
           View
-        </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
+        </MenuItem> */}
+        <MenuItem
+          onClick={() => {
+            handleRowOptionsClose()
+            router.push(`/products/add-product?id=${id}`)
+          }}
+          sx={{ '& svg': { mr: 2 } }}
+        >
           <Icon icon='tabler:edit' fontSize={20} />
           Edit
         </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
+        {/* <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
           <Icon icon='tabler:trash' fontSize={20} />
           Delete
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
     </>
   )
@@ -130,7 +129,7 @@ const columns = [
     field: 'fullName',
     headerName: 'Product',
     renderCell: ({ row }) => {
-      const { fullName, email } = row
+      const { name, email } = row
 
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -145,7 +144,7 @@ const columns = [
                 '&:hover': { color: 'primary.main' }
               }}
             >
-              {fullName}
+              {name}
             </Typography>
             {/* <Typography noWrap variant='body2' sx={{ color: 'text.disabled' }}>
               {email}
@@ -157,35 +156,19 @@ const columns = [
   },
   {
     flex: 0.15,
-    field: 'role',
+    field: 'category_id',
     minWidth: 170,
-    headerName: 'Category',
-    renderCell: ({ row }) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <CustomAvatar
-            skin='light'
-            sx={{ mr: 4, width: 30, height: 30 }}
-            color={userRoleObj[row.role].color || 'primary'}
-          >
-            <Icon icon={userRoleObj[row.role].icon} />
-          </CustomAvatar>
-          <Typography noWrap sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
-            {row.role}
-          </Typography>
-        </Box>
-      )
-    }
+    headerName: 'Category'
   },
   {
     flex: 0.09,
     minWidth: 140,
     headerName: 'Price',
-    field: 'currentPlan',
+    field: 'unit_price',
     renderCell: ({ row }) => {
       return (
         <Typography noWrap sx={{ fontWeight: 500, color: 'text.secondary', textTransform: 'capitalize' }}>
-          {row.currentPlan}
+          {row.unit_price}
         </Typography>
       )
     }
@@ -193,12 +176,12 @@ const columns = [
   {
     flex: 0.05,
     minWidth: 150,
-    field: 'billing',
+    field: 'min_qty',
     headerName: 'Quantity',
     renderCell: ({ row }) => {
       return (
         <Typography noWrap sx={{ color: 'text.secondary' }}>
-          {row.billing}
+          {row.min_qty}
         </Typography>
       )
     }
@@ -206,20 +189,8 @@ const columns = [
   {
     flex: 0.13,
     minWidth: 130,
-    headerName: 'Stock',
-    field: 'stock',
-    renderCell: ({ row }) => {
-      return (
-        <CustomChip
-          rounded
-          skin='light'
-          size='small'
-          label={row.stock}
-          color={'warning'}
-          sx={{ textTransform: 'capitalize' }}
-        />
-      )
-    }
+    headerName: 'SKU',
+    field: 'code'
   },
 
   {
@@ -228,15 +199,10 @@ const columns = [
     field: 'status',
     headerName: 'Status',
     renderCell: ({ row }) => {
-      return (
-        <CustomChip
-          rounded
-          skin='light'
-          size='small'
-          label={row.status}
-          color={userStatusObj[row.status]}
-          sx={{ textTransform: 'capitalize' }}
-        />
+      return row.status == 0 ? (
+        <CustomChip rounded size='small' skin='light' color='error' label='Inactive' />
+      ) : (
+        <CustomChip rounded size='small' skin='light' color='success' label='Active' />
       )
     }
   },
@@ -251,28 +217,29 @@ const columns = [
 ]
 
 const ProductList = () => {
-  // ** State
-  const [role, setRole] = useState('')
-  const [plan, setPlan] = useState('')
-  const [value, setValue] = useState('')
-  const [status, setStatus] = useState('')
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
+  const dispatch = useDispatch()
+  const getProductList = useSelector(store => store?.getProducts?.data)
+  const getCategoryListData = useSelector(store => store?.getCategoryList?.data)
 
-  const handleFilter = useCallback(val => {
-    setValue(val)
+  console.log('getProductList', getProductList)
+
+  const [filteredValue, setFilteredValue] = useState({ status: null, name: '', page: 1, category_id: '', code: '' })
+
+  useEffect(() => {
+    dispatch(getProducts())
+
+    dispatch(getCategoryList())
   }, [])
 
-  const handleRoleChange = useCallback(e => {
-    setRole(e.target.value)
-  }, [])
+  useEffect(() => {
+    dispatch(getProducts(removeEmptyKeys(filteredValue)))
+  }, [filteredValue])
 
-  const handlePlanChange = useCallback(e => {
-    setPlan(e.target.value)
-  }, [])
+  const handleChangeFilter = e => {
+    const { name, value } = e.target
 
-  const handleStatusChange = useCallback(e => {
-    setStatus(e.target.value)
-  }, [])
+    setFilteredValue({ ...filteredValue, [name]: value })
+  }
 
   return (
     <Grid container spacing={6.5}>
@@ -286,15 +253,17 @@ const ProductList = () => {
                   select
                   fullWidth
                   defaultValue='Select Status'
+                  name='status'
+                  onChange={handleChangeFilter}
                   SelectProps={{
-                    value: role,
+                    value: filteredValue?.category_id,
                     displayEmpty: true,
-                    onChange: e => handleRoleChange(e)
+                    onChange: handleChangeFilter
                   }}
                 >
                   <MenuItem value=''>Select Status</MenuItem>
-                  <MenuItem value='admin'>Published</MenuItem>
-                  <MenuItem value='watch'>Inactive</MenuItem>
+                  <MenuItem value={1}>Active</MenuItem>
+                  <MenuItem value={0}>Inactive</MenuItem>
                 </CustomTextField>
               </Grid>
               <Grid item sm={4} xs={12}>
@@ -302,47 +271,53 @@ const ProductList = () => {
                   select
                   fullWidth
                   defaultValue='Select Category'
+                  onChange={handleChangeFilter}
+                  name='category_id'
                   SelectProps={{
-                    value: plan,
+                    value: filteredValue?.category_id,
                     displayEmpty: true,
-                    onChange: e => handlePlanChange(e)
+                    onChange: handleChangeFilter
                   }}
                 >
                   <MenuItem value=''>Select Category</MenuItem>
-                  <MenuItem value='basic'>Ten</MenuItem>
-                  <MenuItem value='company'>Twenty</MenuItem>
-                  <MenuItem value='enterprise'>Thirty</MenuItem>
+                  {getCategoryListData?.map(v => (
+                    <MenuItem value={v?.id} key={v?.id}>
+                      {v?.name}
+                    </MenuItem>
+                  ))}
                 </CustomTextField>
               </Grid>
               <Grid item sm={4} xs={12}>
                 <CustomTextField
-                  select
+                  value={filteredValue?.code}
                   fullWidth
-                  defaultValue='Select Stock'
-                  SelectProps={{
-                    value: status,
-                    displayEmpty: true,
-                    onChange: e => handleStatusChange(e)
-                  }}
-                >
-                  <MenuItem value=''>Select Stock</MenuItem>
-                  <MenuItem value='active'>In Stock</MenuItem>
-                  <MenuItem value='inactive'>Out of Stock</MenuItem>
-                </CustomTextField>
+                  placeholder='Search Code'
+                  onChange={handleChangeFilter}
+                  name={'code'}
+                />
               </Grid>
             </Grid>
           </CardContent>
           <Divider sx={{ m: '0 !important' }} />
-          <TableHeader value={value} handleFilter={handleFilter} />
+          <TableHeader name='name' value={filteredValue?.name} handleFilter={handleChangeFilter} />
           <DataGrid
             autoHeight
             rowHeight={62}
-            rows={data}
+            rows={getProductList?.data || []}
             columns={columns}
             disableRowSelectionOnClick
-            pageSizeOptions={[10, 25, 50]}
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
+            hideFooter
+            hideFooterPagination
+
+            // pageSizeOptions={[10, 25, 50]}
+            // paginationModel={paginationModel}
+            // onPaginationModelChange={setPaginationModel}
+          />
+          <Pagination
+            style={{ float: 'right', margin: '15px 0' }}
+            count={getProductList?.pagination?.totalPages}
+            page={filteredValue?.page}
+            onChange={(e, v) => setFilteredValue({ ...filteredValue, page: v })}
           />
         </Card>
       </Grid>

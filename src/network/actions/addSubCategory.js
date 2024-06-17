@@ -19,16 +19,16 @@ export const addSubCategoryFaliure = error => ({
 
 // Async Action to Fetch Data
 
-export const addSubCategory = (body, extra) => {
+export const addSubCategory = (url, body, extra) => {
   return async dispatch => {
     try {
-      const response = await ApiPostNoAuth(`/product/add-sub-category`, body)
+      const response = await ApiPostNoAuth(`/product/${url}`, body)
       console.log('response: ', response)
       toast.success(response?.message)
       extra()
       dispatch(addSubCategorySuccess(response))
     } catch (error) {
-      console.log('response, errror')
+      console.log('response, errror', err)
 
       dispatch(addSubCategoryFaliure(error))
     }
