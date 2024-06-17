@@ -13,7 +13,7 @@ const TableHeader = props => {
   const router = useRouter()
 
   // ** Props
-  const { handleFilter, value } = props
+  const { handleFilter, value, name } = props
 
   return (
     <Box
@@ -28,7 +28,13 @@ const TableHeader = props => {
         justifyContent: 'space-between'
       }}
     >
-      <CustomTextField value={value} placeholder='Search Product' onChange={e => handleFilter(e.target.value)} />
+      <CustomTextField
+        value={value}
+        sx={{ mr: 4, mb: 2 }}
+        placeholder='Search Name'
+        onChange={e => handleFilter(e)}
+        name={name}
+      />{' '}
       <Box sx={{ rowGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <Button color='secondary' variant='tonal' startIcon={<Icon icon='tabler:upload' />} sx={{ mr: 4 }}>
           Export

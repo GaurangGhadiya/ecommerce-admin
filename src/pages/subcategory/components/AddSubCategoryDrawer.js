@@ -28,6 +28,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getCategoryList } from 'src/network/actions/getCategoryList'
 import { addSubCategory } from 'src/network/actions/addSubCategory'
 import removeEmptyKeys from 'src/utils/ObjectClean'
+import { getSubCategory } from 'src/network/actions/getSubCategory'
 
 // ** Styles
 const Header = styled(Box)(({ theme }) => ({
@@ -110,7 +111,6 @@ const AddSubCategoryDrawer = props => {
   const onSubmit = data => {
     const formData = new FormData()
     formData.append('name', data?.name)
-    formData.append('code', data?.code)
     formData.append('details', data?.details)
     formData.append('status', data?.status)
     formData.append('category_id', data?.category_id)
@@ -122,15 +122,26 @@ const AddSubCategoryDrawer = props => {
       toggle()
       reset()
       setEditData(null)
+      setFiles([])
+    }
+    let url
+    if (editData) {
+      formData.append('subcategory_id', editData?.id)
+
+      url = 'update-sub-category'
+    } else {
+      formData.append('code', data?.code)
+      url = 'add-sub-category'
     }
 
-    dispatch(addSubCategory(formData, extra))
+    dispatch(addSubCategory(url, formData, extra))
   }
 
   const handleClose = () => {
     reset()
     toggle()
     setEditData(null)
+    setFiles([])
   }
 
   return (
@@ -143,7 +154,7 @@ const AddSubCategoryDrawer = props => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant='h5'>Add Sub Category</Typography>
+        <Typography variant='h5'>{editData ? 'Update' : 'Add'} Sub Category</Typography>
         <IconButton
           size='small'
           onClick={handleClose}
@@ -269,7 +280,7 @@ const AddSubCategoryDrawer = props => {
           />
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button type='submit' variant='contained' sx={{ mr: 3 }}>
-              Add
+              {editData ? 'Update' : 'Add'}
             </Button>
             <Button variant='tonal' color='error' onClick={handleClose}>
               Discard
