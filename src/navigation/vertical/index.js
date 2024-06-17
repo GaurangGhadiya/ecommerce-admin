@@ -61,6 +61,20 @@ const navigation = () => {
           path: '/customers/customer-detail'
         }
       ]
+    },
+    {
+      title: 'Sellers',
+      icon: 'tabler:user',
+      children: [
+        {
+          title: 'Seller List',
+          path: '/sellers'
+        },
+        {
+          title: 'Add Seller',
+          path: '/sellers/add-seller'
+        }
+      ]
     }
 
     // {

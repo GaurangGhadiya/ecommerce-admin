@@ -1,0 +1,268 @@
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Box, Button, Card, CardContent, CardHeader, Grid, Typography } from '@mui/material'
+import React, { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import PageHeader from 'src/@core/components/page-header'
+import * as yup from 'yup'
+
+const schema = yup.object().shape({
+  name: yup.string().required('Name is required'),
+  mobile_no: yup.string().required('Mobile Number is required'),
+  email: yup.string().required('Email Id is required'),
+  password: yup.string().required('Password is required'),
+  shop_name: yup.string().required('Shop Name is required'),
+  shop_address: yup.string().required('Shop Address is required'),
+  seller_image: yup.array().min(1, 'Seller Image is required'),
+  shop_logo: yup.array().min(1, 'Shop logo is required'),
+  shop_banner: yup.array().min(1, 'Shop Banner is required')
+})
+
+const AddSeller = () => {
+  const [sellerImage, setSellerImage] = useState([])
+  const [shopLogo, setShopLogo] = useState([])
+  const [shopBanner, setShopBanner] = useState([])
+
+  const {
+    setValue,
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors }
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: '',
+      mobile_no: '',
+      email: '',
+      password: '',
+      shop_name: '',
+      shop_address: '',
+      seller_image: [],
+      shop_logo: [],
+      shop_banner: []
+    }
+  })
+
+  const onSubmit = data => {}
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Grid container spacing={6} alignItems={'center'} display={'flex'}>
+        <Grid item xs={12} md={6}>
+          <PageHeader title={<Typography variant='h4'>Add a New Seller</Typography>} />
+        </Grid>
+        <Grid item xs={12} md={6} textAlign={'right'}>
+          <Button variant='tonal' color='secondary'>
+            Discard
+          </Button>
+          <Button variant='contained' type='submit' style={{ marginLeft: '15px' }}>
+            Add Seller
+          </Button>
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={6} mt={0}>
+        <Grid item xs={12} md={12}>
+          <Card>
+            <CardHeader title='Seller Information' />
+            <CardContent>
+              <Grid container spacing={6}>
+                <Grid item xs={12} md={6}>
+                  <Controller
+                    name='name'
+                    control={control}
+                    render={({ field }) => (
+                      <CustomTextField
+                        {...field}
+                        fullWidth
+                        label='Name'
+                        placeholder='Saller Name'
+                        error={Boolean(errors.name)}
+                        helperText={errors.name?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Controller
+                    name='email'
+                    control={control}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        type='email'
+                        label='Email'
+                        placeholder='email address'
+                        {...field}
+                        error={Boolean(errors.email)}
+                        helperText={errors.email?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <Controller
+                    name='mobile_no'
+                    control={control}
+                    render={({ field }) => (
+                      <CustomTextField
+                        {...field}
+                        fullWidth
+                        type='number'
+                        label='Mobile No.'
+                        placeholder='Mobile No.'
+                        error={Boolean(errors.mobile_no)}
+                        helperText={errors.mobile_no?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Controller
+                    name='password'
+                    control={control}
+                    render={({ field }) => (
+                      <CustomTextField
+                        {...field}
+                        fullWidth
+                        label='Password'
+                        type='password'
+                        placeholder='Password'
+                        error={Boolean(errors.password)}
+                        helperText={errors.password?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Controller
+                    name='shop_name'
+                    control={control}
+                    render={({ field }) => (
+                      <CustomTextField
+                        {...field}
+                        fullWidth
+                        label='Shop Name'
+                        placeholder='Shop Name'
+                        error={Boolean(errors.shop_name)}
+                        helperText={errors.shop_name?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} md={12}>
+                  <Controller
+                    name='shop_address'
+                    control={control}
+                    render={({ field }) => (
+                      <CustomTextField
+                        {...field}
+                        fullWidth
+                        rows={5}
+                        multiline
+                        label='Shop Address'
+                        placeholder='Shop Address'
+                        error={Boolean(errors.shop_address)}
+                        helperText={errors.shop_address?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardHeader title='Seller Image' />
+            <CardContent>
+              <Grid container spacing={6}>
+                <Grid item xs={12}>
+                  <Box mb={4}>
+                    <Controller
+                      name='seller_image'
+                      control={control}
+                      render={({ field }) => (
+                        <FileUploaderRestrictions
+                          maxFiles={1}
+                          files={sellerImage}
+                          setFiles={acceptedFiles => {
+                            setSellerImage(acceptedFiles)
+                            setValue('seller_image', acceptedFiles)
+                          }}
+                          error={errors.seller_image || ''}
+                        />
+                      )}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardHeader title='Shop Logo' />
+            <CardContent>
+              <Grid container spacing={6}>
+                <Grid item xs={12}>
+                  <Box mb={4}>
+                    <Controller
+                      name='shop_logo'
+                      control={control}
+                      render={({ field }) => (
+                        <FileUploaderRestrictions
+                          maxFiles={1}
+                          files={shopLogo}
+                          setFiles={acceptedFiles => {
+                            setShopLogo(acceptedFiles)
+                            setValue('shop_logo', acceptedFiles)
+                          }}
+                          error={errors.shop_logo || ''}
+                        />
+                      )}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardHeader title='Shop Banner' />
+            <CardContent>
+              <Grid container spacing={6}>
+                <Grid item xs={12}>
+                  <Box mb={4}>
+                    <Controller
+                      name='shop_banner'
+                      control={control}
+                      render={({ field }) => (
+                        <FileUploaderRestrictions
+                          maxFiles={1}
+                          files={shopBanner}
+                          setFiles={acceptedFiles => {
+                            setShopBanner(acceptedFiles)
+                            setValue('shop_banner', acceptedFiles)
+                          }}
+                          error={errors.shop_banner || ''}
+                        />
+                      )}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </form>
+  )
+}
+
+export default AddSeller
