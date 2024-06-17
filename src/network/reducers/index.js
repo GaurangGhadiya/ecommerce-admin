@@ -5,6 +5,11 @@ import getCategory from './getCategory'
 import getCategoryList from './getCategoryList'
 import addSubCategory from './addSubCategory'
 import getSubCategory from './getSubCategory'
+import getSubCategoryList from './getSubCategoryList'
+import getProducts from './getProducts'
+import getUnit from './getUnit'
+import addProduct from './addProduct'
+import getProductById from './getProductById'
 
 const rootReducer = combineReducers({
   getCode,
@@ -12,7 +17,12 @@ const rootReducer = combineReducers({
   getCategory,
   getCategoryList,
   addSubCategory,
-  getSubCategory
+  getSubCategory,
+  getSubCategoryList,
+  getProducts,
+  getUnit,
+  addProduct,
+  getProductById
 })
 
 export default rootReducer

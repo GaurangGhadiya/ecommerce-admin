@@ -42,9 +42,8 @@ const toolbarOptions = {
   }
 }
 
-const EditorControlled = () => {
+const EditorControlled = ({ value, setValue }) => {
   // ** State
-  const [value, setValue] = useState(EditorState.createEmpty())
 
   return (
     <ReactDraftWysiwyg

@@ -77,6 +77,8 @@ const AddCategoryDrawer = props => {
     resolver: yupResolver(schema)
   })
 
+  console.log('errors', errors)
+
   useEffect(() => {
     if (open) {
       dispatch(getCode())
@@ -94,14 +96,13 @@ const AddCategoryDrawer = props => {
       setValue('details', editData?.details)
       setValue('name', editData?.name)
       setValue('status', editData?.status)
-      setValue('files', editData?.icon)
+      setValue('files', [editData?.icon])
     }
   }, [editData])
 
   const onSubmit = data => {
     const formData = new FormData()
     formData.append('name', data?.name)
-    formData.append('code', data?.code)
     formData.append('details', data?.details)
     formData.append('status', data?.status)
     formData.append('categoryicon', data?.files?.[0])
@@ -111,9 +112,19 @@ const AddCategoryDrawer = props => {
       toggle()
       reset()
       setEditData(null)
+      setFiles([])
+    }
+    let url
+    if (editData) {
+      formData.append('category_id', editData?.id)
+
+      url = 'update-category'
+    } else {
+      formData.append('code', data?.code)
+      url = 'add-category'
     }
 
-    dispatch(addCategory(formData, extra))
+    dispatch(addCategory(url, formData, extra))
     console.log(data)
   }
 
@@ -121,6 +132,7 @@ const AddCategoryDrawer = props => {
     toggle()
     reset()
     setEditData(null)
+    setFiles([])
   }
 
   return (
@@ -133,7 +145,7 @@ const AddCategoryDrawer = props => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant='h5'>Add Category</Typography>
+        <Typography variant='h5'>{editData ? 'Update' : 'Add'} Category</Typography>
         <IconButton
           size='small'
           onClick={handleClose}
@@ -239,7 +251,7 @@ const AddCategoryDrawer = props => {
           />
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button type='submit' variant='contained' sx={{ mr: 3 }}>
-              Add
+              {editData ? 'Update' : 'Add'}
             </Button>
             <Button variant='tonal' color='error' onClick={handleClose}>
               Discard
