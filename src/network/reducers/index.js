@@ -10,6 +10,9 @@ import getProducts from './getProducts'
 import getUnit from './getUnit'
 import addProduct from './addProduct'
 import getProductById from './getProductById'
+import addSeller from './addSeller'
+import getSeller from './getSeller'
+import getSellerById from './getSellerById'
 
 const rootReducer = combineReducers({
   getCode,
@@ -22,7 +25,10 @@ const rootReducer = combineReducers({
   getProducts,
   getUnit,
   addProduct,
-  getProductById
+  getProductById,
+  addSeller,
+  getSeller,
+  getSellerById
 })
 
 export default rootReducer
