@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, Fragment } from 'react'
+import { useState, Fragment, useEffect } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
@@ -36,6 +36,16 @@ const MenuItemStyled = styled(MenuItem)(({ theme }) => ({
 }))
 
 const UserDropdown = props => {
+  const [userData, setUserData] = useState({})
+
+  useEffect(() => {
+    if (localStorage.getItem('userData')) {
+      setUserData(JSON.parse(localStorage.getItem('userData')))
+    }
+  }, [])
+
+  console.log('userData', userData)
+
   // ** Props
   const { settings } = props
 
@@ -76,7 +86,9 @@ const UserDropdown = props => {
   }
 
   const handleLogout = () => {
-    logout()
+    // logout()
+    localStorage.clear()
+    window.location.pathname = '/login'
     handleDropdownClose()
   }
 
@@ -120,8 +132,8 @@ const UserDropdown = props => {
               <Avatar alt='John Doe' src='/images/avatars/1.png' sx={{ width: '2.5rem', height: '2.5rem' }} />
             </Badge>
             <Box sx={{ display: 'flex', ml: 2.5, alignItems: 'flex-start', flexDirection: 'column' }}>
-              <Typography sx={{ fontWeight: 500 }}>John Doe</Typography>
-              <Typography variant='body2'>Admin</Typography>
+              <Typography sx={{ fontWeight: 500 }}>{userData?.name}</Typography>
+              <Typography variant='body2'>{userData?.role}</Typography>
             </Box>
           </Box>
         </Box>

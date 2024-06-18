@@ -50,7 +50,7 @@ const UnderMaintenance = () => {
           <Typography sx={{ mb: 2, color: 'text.secondary' }}>
             Sorry for the inconvenience but we're performing some maintenance at the moment
           </Typography>
-          <Button href='/' component={Link} variant='contained'>
+          <Button href='/login' onClick={() => localStorage.clear()} component={Link} variant='contained'>
             Back to Home
           </Button>
         </BoxWrapper>

@@ -32,7 +32,7 @@ const CanViewNavGroup = props => {
   if (navGroup && navGroup.auth === false) {
     return <>{children}</>
   } else {
-    return navGroup && canViewMenuGroup(navGroup) ? <>{children}</> : null
+    return <>{children}</>
   }
 }
 

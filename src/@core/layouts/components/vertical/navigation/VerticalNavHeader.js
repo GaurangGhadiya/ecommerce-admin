@@ -12,6 +12,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Configs
 import themeConfig from 'src/configs/themeConfig'
+import { useEffect, useState } from 'react'
 
 // ** Styled Components
 const MenuHeaderWrapper = styled(Box)(({ theme }) => ({
@@ -54,6 +55,13 @@ const VerticalNavHeader = props => {
   const theme = useTheme()
   const { navCollapsed } = settings
   const menuCollapsedStyles = navCollapsed && !navHover ? { opacity: 0 } : { opacity: 1 }
+  const [userData, setUserData] = useState({})
+
+  useEffect(() => {
+    if (localStorage.getItem('userData')) {
+      setUserData(JSON.parse(localStorage.getItem('userData')))
+    }
+  }, [])
 
   const menuHeaderPaddingLeft = () => {
     if (navCollapsed && !navHover) {
@@ -104,7 +112,7 @@ const VerticalNavHeader = props => {
             />
           </svg>
           <HeaderTitle variant='h4' sx={{ ...menuCollapsedStyles, ...(navCollapsed && !navHover ? {} : { ml: 2.5 }) }}>
-            {themeConfig.templateName}
+            {userData?.role}
           </HeaderTitle>
         </LinkStyled>
       )}
