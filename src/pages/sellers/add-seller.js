@@ -1,10 +1,13 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Box, Button, Card, CardContent, CardHeader, Grid, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import { Box, Button, Card, CardContent, CardHeader, Grid, MenuItem, Typography } from '@mui/material'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { useDispatch } from 'react-redux'
 import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import PageHeader from 'src/@core/components/page-header'
+import { addSeller } from 'src/network/actions/addSeller'
 import * as yup from 'yup'
 
 const schema = yup.object().shape({
@@ -16,10 +19,14 @@ const schema = yup.object().shape({
   shop_address: yup.string().required('Shop Address is required'),
   seller_image: yup.array().min(1, 'Seller Image is required'),
   shop_logo: yup.array().min(1, 'Shop logo is required'),
-  shop_banner: yup.array().min(1, 'Shop Banner is required')
+  shop_banner: yup.array().min(1, 'Shop Banner is required'),
+  is_active: yup.number().required('Status is required')
 })
 
 const AddSeller = () => {
+  const dispatch = useDispatch()
+  const router = useRouter()
+  const { id } = router.query
   const [sellerImage, setSellerImage] = useState([])
   const [shopLogo, setShopLogo] = useState([])
   const [shopBanner, setShopBanner] = useState([])
@@ -42,17 +49,47 @@ const AddSeller = () => {
       shop_address: '',
       seller_image: [],
       shop_logo: [],
-      shop_banner: []
+      shop_banner: [],
+      is_active: 0
     }
   })
 
-  const onSubmit = data => {}
+  useEffect(() => {
+    if (id) {
+      //   dispatch(getSellerById(id))
+    }
+  }, [dispatch, id])
+
+  const onSubmit = data => {
+    const formData = new FormData()
+    formData.append('name', data?.name)
+    formData.append('mobile_no', data?.mobile_no)
+    formData.append('email', data?.email)
+    formData.append('password', data?.password)
+    formData.append('shop_name', data?.shop_name)
+    formData.append('shop_address', data?.shop_address)
+    formData.append('seller_image', data?.seller_image?.[0])
+    formData.append('shop_logo', data?.shop_logo?.[0])
+    formData.append('shop_banner', data?.shop_banner?.[0])
+    formData.append('is_active', data?.is_active)
+
+    const extra = () => {
+      reset()
+      router.push('/sellers')
+    }
+
+    if (id) {
+      dispatch(addSeller('update-seller', formData, extra))
+    } else {
+      dispatch(addSeller('add-seller', formData, extra))
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={6} alignItems={'center'} display={'flex'}>
         <Grid item xs={12} md={6}>
-          <PageHeader title={<Typography variant='h4'>Add a New Seller</Typography>} />
+          <PageHeader title={<Typography variant='h4'>{id ? 'Update' : 'Add New'} Seller</Typography>} />
         </Grid>
         <Grid item xs={12} md={6} textAlign={'right'}>
           <Button variant='tonal' color='secondary'>
@@ -70,7 +107,7 @@ const AddSeller = () => {
             <CardHeader title='Seller Information' />
             <CardContent>
               <Grid container spacing={6}>
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={4}>
                   <Controller
                     name='name'
                     control={control}
@@ -86,7 +123,7 @@ const AddSeller = () => {
                     )}
                   />
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={4}>
                   <Controller
                     name='email'
                     control={control}
@@ -151,6 +188,26 @@ const AddSeller = () => {
                         error={Boolean(errors.shop_name)}
                         helperText={errors.shop_name?.message}
                       />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Controller
+                    name='is_active'
+                    control={control}
+                    render={({ field }) => (
+                      <CustomTextField
+                        {...field}
+                        select
+                        fullWidth
+                        label='Status'
+                        defaultValue=''
+                        error={Boolean(errors.is_active)}
+                        helperText={errors.is_active?.message}
+                      >
+                        <MenuItem value={1}>Active</MenuItem>
+                        <MenuItem value={0}>Inactive</MenuItem>
+                      </CustomTextField>
                     )}
                   />
                 </Grid>
