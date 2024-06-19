@@ -1,14 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Box, Button, Card, CardContent, CardHeader, Grid, MenuItem, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import FileUploaderRestrictions from 'src/@core/components/FileUploaderRestrictions/FileUploaderRestrictions'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import PageHeader from 'src/@core/components/page-header'
+import BlankLayout from 'src/@core/layouts/BlankLayout'
 import { addSeller } from 'src/network/actions/addSeller'
-import { getSellerById } from 'src/network/actions/getSellerById'
 import * as yup from 'yup'
 
 const schema = yup.object().shape({
@@ -24,7 +24,7 @@ const schema = yup.object().shape({
   is_active: yup.number().required('Status is required')
 })
 
-const AddSeller = () => {
+const SellerSignUp = () => {
   const dispatch = useDispatch()
   const router = useRouter()
   const { id } = router.query
@@ -57,27 +57,6 @@ const AddSeller = () => {
     }
   })
 
-  useEffect(() => {
-    if (id && getSellerByIdData) {
-      setValue('name', getSellerByIdData?.name)
-      setValue('mobile_no', getSellerByIdData?.mobile_no)
-      setValue('email', getSellerByIdData?.email)
-      setValue('password', getSellerByIdData?.password)
-      setValue('shop_name', getSellerByIdData?.shop_name)
-      setValue('shop_address', getSellerByIdData?.shop_address)
-      setValue('seller_image', [getSellerByIdData?.seller_image])
-      setValue('shop_logo', [getSellerByIdData?.shop_logo])
-      setValue('shop_banner', [getSellerByIdData?.shop_banner])
-      setValue('is_active', getSellerByIdData?.is_active)
-    }
-  }, [getSellerByIdData])
-
-  useEffect(() => {
-    if (id) {
-      dispatch(getSellerById({ seller_id: id }))
-    }
-  }, [dispatch, id])
-
   const onSubmit = data => {
     const formData = new FormData()
     formData.append('name', data?.name)
@@ -93,7 +72,7 @@ const AddSeller = () => {
 
     const extra = () => {
       reset()
-      router.push('/sellers')
+      router.push('/login')
     }
 
     if (id) {
@@ -107,7 +86,7 @@ const AddSeller = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={6} alignItems={'center'} display={'flex'}>
+      {/* <Grid container spacing={6} alignItems={'center'} display={'flex'}>
         <Grid item xs={12} md={6}>
           <PageHeader title={<Typography variant='h4'>{id ? 'Update' : 'Add New'} Seller</Typography>} />
         </Grid>
@@ -119,12 +98,12 @@ const AddSeller = () => {
             {id ? 'Update' : 'Add'} Seller
           </Button>
         </Grid>
-      </Grid>
+      </Grid> */}
 
-      <Grid container spacing={6} mt={0}>
+      <Grid container spacing={6} width={'80%'} margin={'auto'}>
         <Grid item xs={12} md={12}>
           <Card>
-            <CardHeader title='Seller Information' />
+            <CardHeader title='Seller Signup' />
             <CardContent>
               <Grid container spacing={6}>
                 <Grid item xs={12} md={4}>
@@ -337,9 +316,23 @@ const AddSeller = () => {
             </CardContent>
           </Card>
         </Grid>
+
+        <Grid container spacing={6} mt={4} mb={5}>
+          <Grid item xs={12} md={12} textAlign={'center'}>
+            <Button variant='tonal' color='secondary' onClick={() => router.push('/login')}>
+              back
+            </Button>
+            <Button variant='contained' type='submit' style={{ marginLeft: '15px' }}>
+              Signup as Seller
+            </Button>
+          </Grid>
+        </Grid>
       </Grid>
     </form>
   )
 }
 
-export default AddSeller
+SellerSignUp.getLayout = page => <BlankLayout>{page}</BlankLayout>
+SellerSignUp.guestGuard = true
+
+export default SellerSignUp
