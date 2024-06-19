@@ -1,3 +1,7 @@
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
+
+export const LOGIN_FALIURE = 'LOGIN_FALIURE'
+
 export const GET_CODE_SUCCESS = 'GET_CODE_SUCCESS'
 
 export const GET_CODE_FALIURE = 'GET_CODE_FALIURE'

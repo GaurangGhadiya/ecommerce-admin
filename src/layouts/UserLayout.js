@@ -5,7 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Layout from 'src/@core/layouts/Layout'
 
 // ** Navigation Imports
-import VerticalNavItems from 'src/navigation/vertical'
+import VerticalNavItems, { navigationSeller } from 'src/navigation/vertical'
 import HorizontalNavItems from 'src/navigation/horizontal'
 
 // ** Component Import
@@ -18,8 +18,17 @@ import HorizontalAppBarContent from './components/horizontal/AppBarContent'
 
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
+import { useEffect, useState } from 'react'
 
 const UserLayout = ({ children, contentHeightFixed }) => {
+  const [userData, setUserData] = useState({})
+
+  useEffect(() => {
+    if (localStorage.getItem('userData')) {
+      setUserData(JSON.parse(localStorage.getItem('userData')))
+    }
+  }, [])
+
   // ** Hooks
   const { settings, saveSettings } = useSettings()
 
@@ -47,7 +56,8 @@ const UserLayout = ({ children, contentHeightFixed }) => {
       contentHeightFixed={contentHeightFixed}
       verticalLayoutProps={{
         navMenu: {
-          navItems: VerticalNavItems()
+          // navItems: VerticalNavItems()
+          navItems: userData?.role == 'Admin' ? VerticalNavItems() : navigationSeller()
 
           // Uncomment the below line when using server-side menu in vertical layout and comment the above line
           // navItems: verticalMenuItems
@@ -78,7 +88,6 @@ const UserLayout = ({ children, contentHeightFixed }) => {
       })}
     >
       {children}
-      
     </Layout>
   )
 }
