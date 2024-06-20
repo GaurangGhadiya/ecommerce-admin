@@ -89,9 +89,10 @@ const App = props => {
   const getLayout =
     Component.getLayout ?? (page => <UserLayout contentHeightFixed={contentHeightFixed}>{page}</UserLayout>)
   const setConfig = Component.setConfig ?? undefined
-  const authGuard = Component.authGuard ?? true
-  const guestGuard = Component.guestGuard ?? false
-  const aclAbilities = Component.acl ?? defaultACLObj
+
+  // const authGuard = Component.authGuard ?? true
+  // const guestGuard = Component.guestGuard ?? false
+  // const aclAbilities = Component.acl ?? defaultACLObj
 
   return (
     <CacheProvider value={emotionCache}>
@@ -102,28 +103,28 @@ const App = props => {
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
 
-      <AuthProvider>
-        <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
-          <SettingsConsumer>
-            {({ settings }) => {
-              return (
-                <Provider store={store}>
-                  <ThemeComponent settings={settings}>
-                    <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                      <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}>
-                        {getLayout(<Component {...pageProps} />)}
-                      </AclGuard>
-                    </Guard>
-                    <ReactHotToast>
-                      <Toaster position={'top-right'} />
-                    </ReactHotToast>
-                  </ThemeComponent>
-                </Provider>
-              )
-            }}
-          </SettingsConsumer>
-        </SettingsProvider>
-      </AuthProvider>
+      {/* <AuthProvider> */}
+      <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
+        <SettingsConsumer>
+          {({ settings }) => {
+            return (
+              <Provider store={store}>
+                <ThemeComponent settings={settings}>
+                  {/* <Guard authGuard={authGuard} guestGuard={guestGuard}> */}
+                  {/* <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}> */}
+                  {getLayout(<Component {...pageProps} />)}
+                  {/* </AclGuard> */}
+                  {/* </Guard> */}
+                  <ReactHotToast>
+                    <Toaster position={'top-right'} />
+                  </ReactHotToast>
+                </ThemeComponent>
+              </Provider>
+            )
+          }}
+        </SettingsConsumer>
+      </SettingsProvider>
+      {/* </AuthProvider> */}
     </CacheProvider>
   )
 }
