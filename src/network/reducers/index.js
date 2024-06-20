@@ -13,6 +13,7 @@ import getProductById from './getProductById'
 import addSeller from './addSeller'
 import getSeller from './getSeller'
 import getSellerById from './getSellerById'
+import login from './login'
 
 const rootReducer = combineReducers({
   getCode,
@@ -28,7 +29,8 @@ const rootReducer = combineReducers({
   getProductById,
   addSeller,
   getSeller,
-  getSellerById
+  getSellerById,
+  login
 })
 
 export default rootReducer

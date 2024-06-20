@@ -42,6 +42,8 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import { useRouter } from 'next/router'
+import { useDispatch } from 'react-redux'
+import { login } from 'src/network/actions/login'
 
 // ** Styled Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -82,17 +84,18 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
 }))
 
 const schema = yup.object().shape({
-  email: yup.string().email().required(),
-  password: yup.string().min(5).required()
+  username: yup.string().required(),
+  password: yup.string().required()
 })
 
 const defaultValues = {
-  password: 'admin',
-  email: 'admin@gmail.com'
+  password: '',
+  username: ''
 }
 
 const LoginPage = () => {
   const router = useRouter()
+  const dispatch = useDispatch()
   const [rememberMe, setRememberMe] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
 
@@ -102,6 +105,7 @@ const LoginPage = () => {
   const bgColors = useBgColor()
   const { settings } = useSettings()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
+  const [type, setType] = useState('admin')
 
   // ** Vars
   const { skin } = settings
@@ -113,34 +117,18 @@ const LoginPage = () => {
     formState: { errors }
   } = useForm({
     defaultValues,
-    mode: 'onBlur',
+
+    // mode: 'onBlur',
     resolver: yupResolver(schema)
   })
 
   const onSubmit = data => {
-    const { email, password } = data
-    localStorage.setItem(
-      'userData',
-      JSON.stringify({
-        id: 1,
-        role: 'admin',
-        fullName: 'John Doe',
-        username: 'johndoe',
-        email: 'admin@vuexy.com'
-      })
-    )
-    localStorage.setItem(
-      'accessToken',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE3NjA1ODI3LCJleHAiOjE3MTc2MDYxMjd9.wwzW-kxyJXVQsQ6kazhyjSS6zvMfPI7-_vhVIOCMSrM'
-    )
-    window.location.pathname = '/dashboard'
-
-    // auth.login({ email, password, rememberMe }, () => {
-    //   setError('email', {
-    //     type: 'manual',
-    //     message: 'Email or Password is invalid'
-    //   })
-    // })
+    const { username, password } = data
+    if (type == 'admin') {
+      dispatch(login('admin-login', { username, password }))
+    } else {
+      dispatch(login('seller-login', { username, password }))
+    }
   }
   const imageSource = skin === 'bordered' ? 'auth-v2-login-illustration-bordered' : 'auth-v2-login-illustration'
 
@@ -204,35 +192,28 @@ const LoginPage = () => {
             </svg>
             <Box sx={{ my: 6 }}>
               <Typography variant='h3' sx={{ mb: 1.5 }}>
-                {`Welcome to Admin! 👋🏻`}
+                {`Welcome to ${type == 'admin' ? 'Admin' : 'Seller'}! 👋🏻`}
               </Typography>
               <Typography sx={{ color: 'text.secondary' }}>Please sign-in to your account</Typography>
             </Box>
-            {/* <Alert icon={false} sx={{ py: 3, mb: 6, ...bgColors.primaryLight, '& .MuiAlert-message': { p: 0 } }}>
-              <Typography variant='body2' sx={{ mb: 2, color: 'primary.main' }}>
-                Admin: <strong>admin@vuexy.com</strong> / Pass: <strong>admin</strong>
-              </Typography>
-              <Typography variant='body2' sx={{ color: 'primary.main' }}>
-                Client: <strong>client@vuexy.com</strong> / Pass: <strong>client</strong>
-              </Typography>
-            </Alert> */}
+
             <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ mb: 4 }}>
                 <Controller
-                  name='email'
+                  name='username'
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange, onBlur } }) => (
                     <CustomTextField
                       fullWidth
                       autoFocus
-                      label='Email'
+                      label='Username'
                       value={value}
                       onBlur={onBlur}
                       onChange={onChange}
-                      placeholder='admin@gmail.com'
-                      error={Boolean(errors.email)}
-                      {...(errors.email && { helperText: errors.email.message })}
+                      placeholder='9016193206'
+                      error={Boolean(errors.username)}
+                      {...(errors.username && { helperText: errors.username.message })}
                     />
                   )}
                 />
@@ -283,48 +264,31 @@ const LoginPage = () => {
                   label='Remember Me'
                   control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />}
                 />
-                {/* <Typography component={LinkStyled} href='/forgot-password'>
-                  Forgot Password?
-                </Typography> */}
               </Box>
               <Button fullWidth type='submit' variant='contained' sx={{ mb: 4 }}>
                 Login
               </Button>
-              {/* <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <Typography sx={{ color: 'text.secondary', mr: 2 }}>New on our platform?</Typography>
-                <Typography href='/register' component={LinkStyled}>
-                  Create an account
-                </Typography>
-              </Box> */}
-              {/* <Divider
-                sx={{
-                  color: 'text.disabled',
-                  '& .MuiDivider-wrapper': { px: 6 },
-                  fontSize: theme.typography.body2.fontSize,
-                  my: theme => `${theme.spacing(6)} !important`
-                }}
-              >
-                or
-              </Divider>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconButton href='/' component={Link} sx={{ color: '#497ce2' }} onClick={e => e.preventDefault()}>
-                  <Icon icon='mdi:facebook' />
-                </IconButton>
-                <IconButton href='/' component={Link} sx={{ color: '#1da1f2' }} onClick={e => e.preventDefault()}>
-                  <Icon icon='mdi:twitter' />
-                </IconButton>
-                <IconButton
-                  href='/'
-                  component={Link}
-                  onClick={e => e.preventDefault()}
-                  sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : 'grey.300') }}
-                >
-                  <Icon icon='mdi:github' />
-                </IconButton>
-                <IconButton href='/' component={Link} sx={{ color: '#db4437' }} onClick={e => e.preventDefault()}>
-                  <Icon icon='mdi:google' />
-                </IconButton>
-              </Box> */}
+              {type == 'seller' && (
+                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }} mb={2}>
+                  <Typography sx={{ color: 'text.secondary', mr: 2 }}>Don't have seller account?</Typography>
+
+                  <Typography href='/seller-signup' onClick={() => setType('seller')} component={LinkStyled}>
+                    Signup with Seller
+                  </Typography>
+                </Box>
+              )}
+              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {/* <Typography sx={{ color: 'text.secondary', mr: 2 }}>New on our platform?</Typography> */}
+                {type == 'admin' ? (
+                  <Typography href='/login' onClick={() => setType('seller')} component={LinkStyled}>
+                    Login with Seller
+                  </Typography>
+                ) : (
+                  <Typography href='/login' onClick={() => setType('admin')} component={LinkStyled}>
+                    Login with Admin
+                  </Typography>
+                )}
+              </Box>
             </form>
           </Box>
         </Box>
